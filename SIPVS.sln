@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.27703.2047
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SIPVS", "SIPVS\SIPVS.csproj", "{4C089FD3-0C28-4724-8D46-7B039919F78C}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{4C089FD3-0C28-4724-8D46-7B039919F78C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4C089FD3-0C28-4724-8D46-7B039919F78C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4C089FD3-0C28-4724-8D46-7B039919F78C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4C089FD3-0C28-4724-8D46-7B039919F78C}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {AA5B0BC3-1ACE-4E56-8B64-97BA7BFC6E96}
+	EndGlobalSection
+EndGlobal
