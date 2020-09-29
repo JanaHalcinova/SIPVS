@@ -1,0 +1,117 @@
+﻿@model SIPVS.Models.Student
+@{
+    ViewBag.Title = "Prihláška";
+}
+
+<div class="jumbotron">
+    <h1>Prihláška na vysokoškolské štúdium</h1>
+    <p class="lead">
+        Prihláška na vysokoškolské štúdium bakalárske – prvý stupeň alebo spojené – prvý a druhý stupeň v jednom celku.
+    </p>
+</div>
+
+@using (Html.BeginForm("Index", "Home", FormMethod.Post, new { }))
+{
+<div class="row">
+    <div>
+        <h3>Údaje o študentovi</h3>
+
+        @if (ViewData.ModelState[""] != null && ViewData.ModelState[""].Errors.Count() > 0)
+        {
+            <div class="alert alert-danger">
+                <button class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+                @Html.ValidationSummary(false, "Pozor! ")
+            </div>
+        }
+
+        <div class="form-group">
+            <label>Akademický rok od:</label>
+            @Html.TextBoxFor(m => m.rok_od, new { @class = "form-control" })
+            @Html.TextBoxFor(m => m.rok_do, new { @class = "form-control" })
+        </div>
+        <div class="form-group">
+            <label>Meno</label>
+            @Html.TextBoxFor(m => m.meno, new { @class = "form-control" })
+        </div>
+        <div class="form-group">
+            <label>Priezvisko</label>
+            @Html.TextBoxFor(m => m.priezvisko, new { @class = "form-control" })
+        </div>
+        <div class="form-group">
+            <label>Rodné priezvisko</label>
+            @Html.TextBoxFor(m => m.rodne_priezvisko, new { @class = "form-control" })
+        </div>
+        <div class="form-group">
+            <label>Akademický titul</label>
+            @Html.TextBoxFor(m => m.titul, new { @class = "form-control" })
+        </div>
+        <div class="form-group">
+            <label>Pohlavie</label>
+            @Html.TextBoxFor(m => m.pohlavie, new { @class = "form-control" })
+        </div>
+        <div class="form-group">
+            <label>Dátum narodenia</label>
+            @Html.TextBoxFor(m => m.datum_narodenia, "{0:dd.MM.yyyy}", new { @class = "form-control datepicker", autocomplete = "off" })
+        </div>
+        <div class="form-group">
+            <label>Miesto narodenia</label>
+            @Html.TextBoxFor(m => m.miesto_narodenia, new { @class = "form-control" })
+        </div>
+        <div class="form-group">
+            <label>Štát</label>
+            @Html.TextBoxFor(m => m.stat, new { @class = "form-control" })
+        </div>
+        <div class="form-group">
+            <label>Rodné číslo</label>
+            @Html.TextBoxFor(m => m.rodne_cislo, new { @class = "form-control" })
+        </div>
+        <div class="form-group">
+            <label>Telefónne číslo</label>
+            @Html.TextBoxFor(m => m.telefon, new { @class = "form-control" })
+        </div>
+        <div class="form-group">
+            <label>Email</label>
+            @Html.TextBoxFor(m => m.email, new { @class = "form-control" })
+        </div>
+
+    </div>
+    <div>
+        <h3>Prospech podľa koncoročného vysvedčenia v jednotlivých ročníkoch strednej školy</h3>
+        <table width="100%" class="table table-striped table-bordered">
+            <thead>
+                <tr>
+                    <th>Predmet</th>
+                    <th>1.</th>
+                    <th>2.</th>
+                    <th>3.</th>
+                    <th>4.</th>
+                    <th>5.</th>
+                    <th>6.</th>
+                </tr>
+            </thead>
+            <tbody>
+
+                @for (var i = 0; i < 20; i++)
+                {
+
+
+                    <tr>
+                        <td>@Html.TextBoxFor(m => m.predmety[i].nazov, new { @class = "form-control" })</td>
+                        <td>@Html.TextBoxFor(m => m.predmety[i].prvy_rocnik, new { @class = "form-control" })</td>
+                        <td>@Html.TextBoxFor(m => m.predmety[i].druhy_rocnik, new { @class = "form-control" })</td>
+                        <td>@Html.TextBoxFor(m => m.predmety[i].treti_rocnik, new { @class = "form-control" })</td>
+                        <td>@Html.TextBoxFor(m => m.predmety[i].stvrty_rocnik, new { @class = "form-control" })</td>
+                        <td>@Html.TextBoxFor(m => m.predmety[i].piaty_rocnik, new { @class = "form-control" })</td>
+                        <td>@Html.TextBoxFor(m => m.predmety[i].siesty_rocnik, new { @class = "form-control" })</td>
+
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+    <button class="btn btn-default" type="submit" name="action" value="submit">Generuj XML</button>
+    <button class="btn btn-default" type="submit" name="action" value="validate">Validuj vygenerované XML</button>
+    <button class="btn btn-default" type="submit" name="action" value="display">Zobraz ako PDF</button>
+</div>
+}
