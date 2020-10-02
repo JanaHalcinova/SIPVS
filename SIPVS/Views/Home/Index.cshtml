@@ -80,7 +80,7 @@ new SelectListItem {Text = "Žena", Value = "Žena"}
 
             <div class="form-group">
                 <label>Dátum narodenia</label>
-                @Html.TextBoxFor(m => m.datum_narodenia, "{0:dd.MM.yyyy}", new { @class = "form-control datepicker", data_val_date = "Hodnota musí byť dátum!", autocomplete = "off" })
+                @Html.TextBoxFor(m => m.datum_narodenia, "{0:dd.mm.yyyy}", new { @class = "form-control datepicker", data_val_date = "Hodnota musí byť dátum!", autocomplete = "off" })
                 @Html.ValidationMessageFor(m => m.datum_narodenia, "", new { @class = "text-danger" })
             </div>
 
@@ -197,7 +197,7 @@ new SelectListItem {Text = "Žena", Value = "Žena"}
             changeYear: true,
             firstDay: 1,
             yearRange: '-90:+0',
-            dateFormat: 'dd.MM.yy'
+            dateFormat: 'dd.mm.yy'
         });
     });
 </script>
