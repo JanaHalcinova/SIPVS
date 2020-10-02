@@ -36,7 +36,7 @@ namespace SIPVS.Models
         [RegularExpression(@"^\s*(\d\d)(\d\d)(\d\d)[ /]*(\d\d\d)(\d?)\s*$", ErrorMessage = "Zadaj valídne rodné číslo.")]
         [Required(ErrorMessage = "Atribút je povinný.")]
         public string rodne_cislo { get; set; }
-        [RegularExpression(@"([0-9]{3})?[ .-]?([0-9]{3})[ .-]?([0-9]{4})", ErrorMessage = "Zadaj valídny formát telefónneho čísla.")]
+        [RegularExpression(@"(^\+42[0-9][0-9]{9}$)|(^09[0-9]{8}$)", ErrorMessage = "Zadaj valídny formát telefónneho čísla.")]
         [Required(ErrorMessage = "Atribút je povinný.")]
         public string telefon { get; set; }
         [RegularExpression(@"^[\w-\._\+%]+@(?:[\w-]+\.)+[\w]{2,6}$", ErrorMessage = "Zadaj valídny email.")]
