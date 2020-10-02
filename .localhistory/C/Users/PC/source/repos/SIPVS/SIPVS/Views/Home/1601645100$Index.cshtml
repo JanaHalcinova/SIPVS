@@ -1,0 +1,202 @@
+﻿@model SIPVS.Models.Student
+@{
+    ViewBag.Title = "Prihláška";
+    var selectList = new SelectList(
+        new List<SelectListItem>
+        {
+new SelectListItem {Text = "Muž", Value = "Muž"},
+new SelectListItem {Text = "Žena", Value = "Žena"}
+        }, "Value", "Text");
+}
+
+<div class="jumbotron">
+    <h1>Prihláška na vysokoškolské štúdium</h1>
+    <p class="lead">
+        Prihláška na vysokoškolské štúdium bakalárske – prvý stupeň alebo spojené – prvý a druhý stupeň v jednom celku.
+    </p>
+</div>
+
+@using (Html.BeginForm("Index", "Home", FormMethod.Post, new { lang = "sk" }))
+{
+    <div class="row">
+        <div class="col-md-6">
+            @if (ViewBag.message != null)
+            {
+                <h2 style="color:red;">@ViewBag.message</h2>
+            }
+
+            <h3>Údaje o študentovi</h3>
+
+            <div class="form-group">
+                <label>Akademický rok od:</label>
+                @Html.TextBoxFor(m => m.rok_od, new { id = "rok_od", data_val_number = "Hodnota musí byť celé číslo!", @class = "form-control" })
+                @Html.ValidationMessageFor(m => m.rok_od, "", new { @class = "text-danger" })
+            </div>
+            <div class="form-group">
+                <label>Akademický rok do:</label>
+                @Html.TextBoxFor(m => m.rok_do, new { data_val_number = "Hodnota musí byť celé číslo!", @class = "form-control" })
+                @Html.ValidationMessageFor(m => m.rok_do, "", new { @class = "text-danger" })
+            </div>
+            <div class="form-group">
+                <label>Meno</label>
+                @Html.TextBoxFor(m => m.meno, new { @class = "form-control" })
+                @Html.ValidationMessageFor(m => m.meno, "", new { @class = "text-danger" })
+
+            </div>
+            <div class="form-group">
+                <label>Priezvisko</label>
+                @Html.TextBoxFor(m => m.priezvisko, new { @class = "form-control" })
+                @Html.ValidationMessageFor(m => m.priezvisko, "", new { @class = "text-danger" })
+
+            </div>
+            <div class="form-group">
+                <label>Rodné priezvisko</label>
+                @Html.TextBoxFor(m => m.rodne_priezvisko, new { @class = "form-control" })
+                @Html.ValidationMessageFor(m => m.rodne_priezvisko, "", new { @class = "text-danger" })
+
+            </div>
+            <div class="form-group">
+                <label>Akademický titul</label>
+                @Html.TextBoxFor(m => m.titul, new { @class = "form-control" })
+                @Html.ValidationMessageFor(m => m.titul, "", new { @class = "text-danger" })
+
+            </div>
+
+
+        </div>
+        <div class="col-md-6">
+
+            <div class="form-group">
+                <label>Pohlavie</label>
+                @Html.DropDownListFor(m => m.pohlavie, selectList, new { @class = "form-control" })
+                @Html.ValidationMessageFor(m => m.pohlavie, "", new { @class = "text-danger" })
+
+            </div>
+
+            <div class="form-group">               
+                    <label>Dátum narodenia</label>
+                    @Html.TextBoxFor(m => m.datum_narodenia, "{0:dd.MM.yyyy}", new { @class = "form-control datepicker", data_val_date = "Hodnota musí byť dátum!", autocomplete = "off" })
+                    @Html.ValidationMessageFor(m => m.datum_narodenia, "", new { @class = "text-danger" })
+            </div>
+
+
+            <div class="form-group">
+                <label>Miesto narodenia</label>
+                @Html.TextBoxFor(m => m.miesto_narodenia, new { @class = "form-control" })
+                @Html.ValidationMessageFor(m => m.miesto_narodenia, "", new { @class = "text-danger" })
+
+            </div>
+            <div class="form-group">
+                <label>Štát</label>
+                @Html.TextBoxFor(m => m.stat, new { @class = "form-control" })
+                @Html.ValidationMessageFor(m => m.stat, "", new { @class = "text-danger" })
+
+            </div>
+            <div class="form-group">
+                <label>Rodné číslo</label>
+                @Html.TextBoxFor(m => m.rodne_cislo, new { @class = "form-control" })
+                @Html.ValidationMessageFor(m => m.rodne_cislo, "", new { @class = "text-danger" })
+
+            </div>
+            <div class="form-group">
+                <label>Telefónne číslo</label>
+                @Html.TextBoxFor(m => m.telefon, new { @class = "form-control" })
+                @Html.ValidationMessageFor(m => m.telefon, "", new { @class = "text-danger" })
+
+            </div>
+            <div class="form-group">
+                <label>Email</label>
+                @Html.TextBoxFor(m => m.email, new { @class = "form-control" })
+                @Html.ValidationMessageFor(m => m.email, "", new { @class = "text-danger" })
+
+            </div>
+
+        </div>
+        <div class="col-md-12">
+            <h3>Prospech podľa koncoročného vysvedčenia v jednotlivých ročníkoch strednej školy</h3>
+            <table width="100%" class="table table-striped table-bordered">
+                <thead>
+                    <tr>
+                        <th>Predmet</th>
+                        <th>1.</th>
+                        <th>2.</th>
+                        <th>3.</th>
+                        <th>4.</th>
+                        <th>5.</th>
+                        <th>6.</th>
+                    </tr>
+                </thead>
+                <tbody>
+
+                    @for (var i = 0; i < 20; i++)
+                    {
+
+
+                        <tr>
+                            <td>
+                                @Html.TextBoxFor(m => m.predmety[i].nazov, new { @class = "form-control" })
+                                @Html.ValidationMessageFor(m => m.predmety[i].nazov, "", new { @class = "text-danger" })
+                            </td>
+                            <td>
+                                @Html.TextBoxFor(m => m.predmety[i].prvy_rocnik, new { @class = "form-control" })
+                                @Html.ValidationMessageFor(m => m.predmety[i].prvy_rocnik, "", new { data-valmsg = "Hodnota musí byť celé číslo!", data_val_number = "Hodnota musí byť celé číslo!", @class = "text-danger" })
+
+                            </td>
+                            <td>
+                                @Html.TextBoxFor(m => m.predmety[i].druhy_rocnik, new { @class = "form-control" })
+                                @Html.ValidationMessageFor(m => m.predmety[i].druhy_rocnik, "", new { data_val_number = "Hodnota musí byť celé číslo!", @class = "text-danger" })
+
+                            </td>
+                            <td>
+                                @Html.TextBoxFor(m => m.predmety[i].treti_rocnik, new { @class = "form-control" })
+                                @Html.ValidationMessageFor(m => m.predmety[i].treti_rocnik, "", new { data_val_number = "Hodnota musí byť celé číslo!", @class = "text-danger" })
+
+                            </td>
+                            <td>
+                                @Html.TextBoxFor(m => m.predmety[i].stvrty_rocnik, new { @class = "form-control" })
+                                @Html.ValidationMessageFor(m => m.predmety[i].stvrty_rocnik, "", new { data_val_number = "Hodnota musí byť celé číslo!", @class = "text-danger" })
+
+                            </td>
+                            <td>
+                                @Html.TextBoxFor(m => m.predmety[i].piaty_rocnik, new { @class = "form-control" })
+                                @Html.ValidationMessageFor(m => m.predmety[i].piaty_rocnik, "", new { data_val_number = "Hodnota musí byť celé číslo!", @class = "text-danger" })
+
+                            </td>
+                            <td>
+                                @Html.TextBoxFor(m => m.predmety[i].siesty_rocnik, new { @class = "form-control" })
+                                @Html.ValidationMessageFor(m => m.predmety[i].siesty_rocnik, "", new { data_val_number = "Hodnota musí byť celé číslo!", @class = "text-danger" })
+
+                            </td>
+
+                        </tr>
+                    }
+                </tbody>
+            </table>
+
+            <button class="btn btn-default" type="submit" name="action" value="submit">Generuj XML</button>
+            <button class="btn btn-default" type="submit" name="action" value="validate">Validuj vygenerované XML</button>
+            <button class="btn btn-default" type="submit" name="action" value="display">Zobraz vygenerovaný dokument</button>
+            <button class="btn btn-default" type="submit" name="action" value="reset">Reset údajov vo formulári</button>
+
+        </div>
+
+
+    </div>
+}
+
+
+    <script>
+        $(document).ready(function () {
+            $(".datepicker").datepicker({
+                buttonImageOnly: true,
+                changeMonth: true,
+                changeYear: true,
+                showWeek: true,
+                firstDay: 1
+            });
+        });
+    </script>
+<script type="text/javascript">
+   
+    //document.getElementById('rok_od').setCustomValidity('Parameter musí byť celé číslo.');
+</script>

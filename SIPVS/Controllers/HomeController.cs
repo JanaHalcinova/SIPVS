@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
+using System.Threading;
 using System.Web;
 using System.Web.Mvc;
 using System.Xml;
@@ -17,6 +19,9 @@ namespace SIPVS.Controllers
         [HttpPost]
         public ActionResult Index(Student student, string action)
         {
+            CultureInfo culture = new CultureInfo("sk-SK");
+            Thread.CurrentThread.CurrentCulture = culture;
+            Thread.CurrentThread.CurrentUICulture = culture;
 
             switch (action)
             {
@@ -46,6 +51,8 @@ namespace SIPVS.Controllers
                     //otvorí xml v prehliadaci na novej karte : automaticky by sa to malo vygenerovat s novym vzhladom
                     ViewBag.message = "PDF bolo vygenerované.";
                     return View(student);
+
+                
 
             }
             return View(student);

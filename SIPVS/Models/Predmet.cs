@@ -10,11 +10,11 @@ namespace SIPVS.Models
     {
         [XmlElement("Nazov")]
         public string nazov { get; set; }
-        public string prvy_rocnik { get; set; }
-        public string druhy_rocnik { get; set; }
-        public string treti_rocnik { get; set; }
-        public string stvrty_rocnik { get; set; }
-        public string piaty_rocnik { get; set; }
-        public string siesty_rocnik { get; set; }
+        public int? prvy_rocnik { get; set; }
+        public int? druhy_rocnik { get; set; }
+        public int? treti_rocnik { get; set; }
+        public int? stvrty_rocnik { get; set; }
+        public int? piaty_rocnik { get; set; }
+        public int? siesty_rocnik { get; set; }
     }
 }
