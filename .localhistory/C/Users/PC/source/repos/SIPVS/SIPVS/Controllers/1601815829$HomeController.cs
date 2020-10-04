@@ -27,7 +27,7 @@ namespace SIPVS.Controllers
             {
               case "submit":
                     Priemerny_predmet priemer = new Priemerny_predmet();
-                    
+                    priemer.nazov = "Priemer";
                     List<int?> prvy = new List<int?>();
                     List<int?> druhy = new List<int?>();
                     List<int?> treti = new List<int?>();
@@ -42,23 +42,23 @@ namespace SIPVS.Controllers
                         }
                         if (predmet.druhy_rocnik != null)
                         {
-                            druhy.Add(predmet.druhy_rocnik);
+                            prvy.Add(predmet.druhy_rocnik);
                         }
                         if (predmet.treti_rocnik != null)
                         {
-                            treti.Add(predmet.treti_rocnik);
+                            prvy.Add(predmet.treti_rocnik);
                         }
                         if (predmet.stvrty_rocnik != null)
                         {
-                            stvrty.Add(predmet.stvrty_rocnik);
+                            prvy.Add(predmet.stvrty_rocnik);
                         }
                         if (predmet.piaty_rocnik != null)
                         {
-                            piaty.Add(predmet.piaty_rocnik);
+                            prvy.Add(predmet.piaty_rocnik);
                         }
                         if (predmet.siesty_rocnik != null)
                         {
-                            siesty.Add(predmet.siesty_rocnik);
+                            prvy.Add(predmet.siesty_rocnik);
                         }
                     }
                     if (prvy.Count > 0)
@@ -92,6 +92,7 @@ namespace SIPVS.Controllers
 
                     var path = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + "//Student.xml";
                     System.IO.FileStream file = System.IO.File.Create(path);
+
                     writer.Serialize(file, student);
                     file.Close();
                     return View(student);
