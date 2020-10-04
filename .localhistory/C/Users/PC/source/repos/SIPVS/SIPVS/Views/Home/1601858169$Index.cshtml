@@ -148,27 +148,27 @@ new SelectListItem {Text = "Žena", Value = "Žena"}
 
                             </td>
                             <td>
-                                @Html.TextBoxFor(m => m.predmety[i].druhy_rocnik, new { type = "number", min = "1", max = "5", data_val_number = "Hodnota musí byť celé číslo!", @class = "form-control" })
+                                @Html.TextBoxFor(m => m.predmety[i].druhy_rocnik, new { data_val_number = "Hodnota musí byť celé číslo!", @class = "form-control" })
                                 @Html.ValidationMessageFor(m => m.predmety[i].druhy_rocnik, "", new { @class = "text-danger" })
 
                             </td>
                             <td>
-                                @Html.TextBoxFor(m => m.predmety[i].treti_rocnik, new { type = "number", min = "1", max = "5", data_val_number = "Hodnota musí byť celé číslo!", @class = "form-control" })
+                                @Html.TextBoxFor(m => m.predmety[i].treti_rocnik, new { data_val_number = "Hodnota musí byť celé číslo!", @class = "form-control" })
                                 @Html.ValidationMessageFor(m => m.predmety[i].treti_rocnik, "", new { @class = "text-danger" })
 
                             </td>
                             <td>
-                                @Html.TextBoxFor(m => m.predmety[i].stvrty_rocnik, new { type = "number", min = "1", max = "5", data_val_number = "Hodnota musí byť celé číslo!", @class = "form-control" })
+                                @Html.TextBoxFor(m => m.predmety[i].stvrty_rocnik, new { data_val_number = "Hodnota musí byť celé číslo!", @class = "form-control" })
                                 @Html.ValidationMessageFor(m => m.predmety[i].stvrty_rocnik, "", new { @class = "text-danger" })
 
                             </td>
                             <td>
-                                @Html.TextBoxFor(m => m.predmety[i].piaty_rocnik, new { type = "number", min = "1", max = "5", data_val_number = "Hodnota musí byť celé číslo!", @class = "form-control" })
+                                @Html.TextBoxFor(m => m.predmety[i].piaty_rocnik, new { data_val_number = "Hodnota musí byť celé číslo!", @class = "form-control" })
                                 @Html.ValidationMessageFor(m => m.predmety[i].piaty_rocnik, "", new { @class = "text-danger" })
 
                             </td>
                             <td>
-                                @Html.TextBoxFor(m => m.predmety[i].siesty_rocnik, new { type = "number", min = "1", max = "5", data_val_number = "Hodnota musí byť celé číslo!", @class = "form-control" })
+                                @Html.TextBoxFor(m => m.predmety[i].siesty_rocnik, new { data_val_number = "Hodnota musí byť celé číslo!", @class = "form-control" })
                                 @Html.ValidationMessageFor(m => m.predmety[i].siesty_rocnik, "", new { @class = "text-danger" })
 
                             </td>
@@ -182,6 +182,8 @@ new SelectListItem {Text = "Žena", Value = "Žena"}
                 <button id="add-tablerow" class="btn btn-default" type="button">+ Pridať predmet</button>
             </div>
 
+            <input type="file" id="fileToUpload" name="file" />
+            <span class="field-validation-error" id="spanfile"></span>
 
             <button class="btn btn-default" type="submit" name="action" value="submit">Generuj XML</button>
             <button class="btn btn-default" type="submit" name="action" value="validate">Validuj vygenerované XML</button>
@@ -201,37 +203,33 @@ new SelectListItem {Text = "Žena", Value = "Žena"}
             firstDay: 1,
             yearRange: '-90:+0',
             dateFormat: 'dd.mm.yy'
+
+            $.validator.addMethod('date',
+                function (value, element, params) {
+                    if (this.optional(element)) {
+                        return true;
+                    }
+
+                    var ok = true;
+                    try {
+                        $.datepicker.parseDate('dd.mm.yy', value);
+                    }
+                    catch (err) {
+                        ok = false;
+                    }
+                    return ok;
+                });
         });
-
-
-        $.validator.addMethod('date',
-            function (value, element, params) {
-                if (this.optional(element)) {
-                    return true;
-                }
-
-                var ok = true;
-                try {
-                    $.datepicker.parseDate('dd.mm.yy', value);
-                }
-                catch (err) {
-                    ok = false;
-                }
-                return ok;
-            });
-
-
-
         var i = 5;
         $("#add-tablerow").click(function () {
             var newRowContent =
                 '<tr><td><input class="form-control" id="predmety_' + i + '__nazov" name="predmety[' + i + '].nazov" type="text" value><span class="field-validation-valid text-danger" data-valmsg-for="predmety[' + i + '].nazov" data-valmsg-replace="true"></span></td>'
                 + '<td><input class="form-control" data-val="true" data-val-number="Hodnota musí byť celé číslo!" id="predmety_' + i + '__prvy_rocnik" name="predmety[' + i + '].prvy_rocnik" type="number" min="1" max="5" value><span class="field-validation-valid text-danger" data-valmsg-for="predmety[' + i + '].prvy_rocnik" data-valmsg-replace="true"></span></td>'
-                + '<td><input class="form-control" data-val="true" data-val-number="Hodnota musí byť celé číslo!" id="predmety_' + i + '__druhy_rocnik" name="predmety[' + i + '].druhy_rocnik" type="number" min="1" max="5" value><span class="field-validation-valid text-danger" data-valmsg-for="predmety[' + i + '].druhy_rocnik" data-valmsg-replace="true"></span></td>'
-                + '<td><input class="form-control" data-val="true" data-val-number="Hodnota musí byť celé číslo!" id="predmety_' + i + '__treti_rocnik" name="predmety[' + i + '].treti_rocnik" type="number" min="1" max="5" value><span class="field-validation-valid text-danger" data-valmsg-for="predmety[' + i + '].treti_rocnik" data-valmsg-replace="true"></span></td>'
-                + '<td><input class="form-control" data-val="true" data-val-number="Hodnota musí byť celé číslo!" id="predmety_' + i + '__stvrty_rocnik" name="predmety[' + i + '].stvrty_rocnik" type="number" min="1" max="5" value><span class="field-validation-valid text-danger" data-valmsg-for="predmety[' + i + '].stvrty_rocnik" data-valmsg-replace="true"></span></td>'
-                + '<td><input class="form-control" data-val="true" data-val-number="Hodnota musí byť celé číslo!" id="predmety_' + i + '__piaty_rocnik" name="predmety[' + i + '].piaty_rocnik" type="number" min="1" max="5" value><span class="field-validation-valid text-danger" data-valmsg-for="predmety[' + i + '].piaty_rocnik" data-valmsg-replace="true"></span></td>'
-                + '<td><input class="form-control" data-val="true" data-val-number="Hodnota musí byť celé číslo!" id="predmety_' + i + '__siesty_rocnik" name="predmety[' + i + '].siesty_rocnik" type="number" min="1" max="5" value><span class="field-validation-valid text-danger" data-valmsg-for="predmety[' + i + '].siesty_rocnik" data-valmsg-replace="true"></span></td></tr>';
+                + '<td><input class="form-control" data-val="true" data-val-number="Hodnota musí byť celé číslo!" id="predmety_' + i + '__druhy_rocnik" name="predmety[' + i + '].druhy_rocnik"  value><span class="field-validation-valid text-danger" data-valmsg-for="predmety[' + i + '].druhy_rocnik" data-valmsg-replace="true"></span></td>'
+                + '<td><input class="form-control" data-val="true" data-val-number="Hodnota musí byť celé číslo!" id="predmety_' + i + '__treti_rocnik" name="predmety[' + i + '].treti_rocnik" type="text" value><span class="field-validation-valid text-danger" data-valmsg-for="predmety[' + i + '].treti_rocnik" data-valmsg-replace="true"></span></td>'
+                + '<td><input class="form-control" data-val="true" data-val-number="Hodnota musí byť celé číslo!" id="predmety_' + i + '__stvrty_rocnik" name="predmety[' + i + '].stvrty_rocnik" type="text" value><span class="field-validation-valid text-danger" data-valmsg-for="predmety[' + i + '].stvrty_rocnik" data-valmsg-replace="true"></span></td>'
+                + '<td><input class="form-control" data-val="true" data-val-number="Hodnota musí byť celé číslo!" id="predmety_' + i + '__piaty_rocnik" name="predmety[' + i + '].piaty_rocnik" type="text" value><span class="field-validation-valid text-danger" data-valmsg-for="predmety[' + i + '].piaty_rocnik" data-valmsg-replace="true"></span></td>'
+                + '<td><input class="form-control" data-val="true" data-val-number="Hodnota musí byť celé číslo!" id="predmety_' + i + '__siesty_rocnik" name="predmety[' + i + '].siesty_rocnik" type="text" value><span class="field-validation-valid text-danger" data-valmsg-for="predmety[' + i + '].siesty_rocnik" data-valmsg-replace="true"></span></td></tr>';
             $("#predmety tbody").append(newRowContent);
             i = i + 1;
         });
