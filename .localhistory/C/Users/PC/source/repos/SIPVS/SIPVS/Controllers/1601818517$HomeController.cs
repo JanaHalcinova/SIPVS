@@ -17,11 +17,8 @@ namespace SIPVS.Controllers
             return View();
         }
         [HttpPost]
-        public ActionResult Index(Student student, string action)
+        public ActionResult Index(Student student, string action, HttpPostedFileBase file)
         {
-            CultureInfo culture = new CultureInfo("sk-SK");
-            Thread.CurrentThread.CurrentCulture = culture;
-            Thread.CurrentThread.CurrentUICulture = culture;
 
             switch (action)
             {
@@ -92,6 +89,7 @@ namespace SIPVS.Controllers
 
                     var path = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + "//Student.xml";
                     System.IO.FileStream file = System.IO.File.Create(path);
+
                     writer.Serialize(file, student);
                     file.Close();
                     return View(student);

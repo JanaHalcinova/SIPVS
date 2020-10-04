@@ -92,6 +92,7 @@ namespace SIPVS.Controllers
 
                     var path = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + "//Student.xml";
                     System.IO.FileStream file = System.IO.File.Create(path);
+                    //return File(filedata, contentType);
                     writer.Serialize(file, student);
                     file.Close();
                     return View(student);

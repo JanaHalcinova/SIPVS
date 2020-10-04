@@ -43,7 +43,6 @@ namespace SIPVS.Models
         [Required(ErrorMessage = "Atribút je povinný.")]
         public string email { get; set; }
         public List<Predmet> predmety { get; set; }
-        public Priemerny_predmet priemer { get; set; }
 
     }
 }
