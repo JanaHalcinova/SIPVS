@@ -16,7 +16,9 @@ namespace SIPVS.Controllers
     {
         public ActionResult Index()
         {
-            return View();
+            Student student = new Student();
+            student.predmety = null;
+            return View(student);
         }
         [HttpPost]
         public ActionResult Index(Student student, string action)

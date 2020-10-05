@@ -6,7 +6,7 @@
         {
 new SelectListItem {Text = "Muž", Value = "Muž"},
 new SelectListItem {Text = "Žena", Value = "Žena"}
-                }, "Value", "Text");
+                        }, "Value", "Text");
 }
 
 <div class="jumbotron">
@@ -133,7 +133,13 @@ new SelectListItem {Text = "Žena", Value = "Žena"}
                 </thead>
                 <tbody>
 
-                    @for (var i = 0; i < 0; i++)
+                    @{int pocet = 0;}
+                    @if (Model.predmety != null)
+                    {
+                        pocet = Model.predmety.Count();
+                    }
+
+                    @for (var i = 0; i < pocet; i++)
                     {
 
 
@@ -180,6 +186,7 @@ new SelectListItem {Text = "Žena", Value = "Žena"}
 
             <div style="margin-bottom:30px;">
                 <button id="add-tablerow" class="btn btn-default" type="button">+ Pridať predmet</button>
+                <input type="hidden" id="PassingToJavaScript1" value=@pocet>
             </div>
 
 
@@ -222,18 +229,18 @@ new SelectListItem {Text = "Žena", Value = "Žena"}
 
 
 
-        var i = 5;
+        var i = document.getElementById('PassingToJavaScript1').value;
         $("#add-tablerow").click(function () {
             var newRowContent =
                 '<tr><td><input class="form-control" id="predmety_' + i + '__nazov" name="predmety[' + i + '].nazov" type="text" value><span class="field-validation-valid text-danger" data-valmsg-for="predmety[' + i + '].nazov" data-valmsg-replace="true"></span></td>'
-                + '<td><input class="form-control" data-val="true" data-val-number="Hodnota musí byť celé číslo!" id="predmety_' + i + '__prvy_rocnik" name="predmety[' + i + '].prvy_rocnik" type="number" min="1" max="5" value><span class="field-validation-valid text-danger" data-valmsg-for="predmety[' + i + '].prvy_rocnik" data-valmsg-replace="true"></span></td>'
-                + '<td><input class="form-control" data-val="true" data-val-number="Hodnota musí byť celé číslo!" id="predmety_' + i + '__druhy_rocnik" name="predmety[' + i + '].druhy_rocnik" type="number" min="1" max="5" value><span class="field-validation-valid text-danger" data-valmsg-for="predmety[' + i + '].druhy_rocnik" data-valmsg-replace="true"></span></td>'
-                + '<td><input class="form-control" data-val="true" data-val-number="Hodnota musí byť celé číslo!" id="predmety_' + i + '__treti_rocnik" name="predmety[' + i + '].treti_rocnik" type="number" min="1" max="5" value><span class="field-validation-valid text-danger" data-valmsg-for="predmety[' + i + '].treti_rocnik" data-valmsg-replace="true"></span></td>'
-                + '<td><input class="form-control" data-val="true" data-val-number="Hodnota musí byť celé číslo!" id="predmety_' + i + '__stvrty_rocnik" name="predmety[' + i + '].stvrty_rocnik" type="number" min="1" max="5" value><span class="field-validation-valid text-danger" data-valmsg-for="predmety[' + i + '].stvrty_rocnik" data-valmsg-replace="true"></span></td>'
-                + '<td><input class="form-control" data-val="true" data-val-number="Hodnota musí byť celé číslo!" id="predmety_' + i + '__piaty_rocnik" name="predmety[' + i + '].piaty_rocnik" type="number" min="1" max="5" value><span class="field-validation-valid text-danger" data-valmsg-for="predmety[' + i + '].piaty_rocnik" data-valmsg-replace="true"></span></td>'
-                + '<td><input class="form-control" data-val="true" data-val-number="Hodnota musí byť celé číslo!" id="predmety_' + i + '__siesty_rocnik" name="predmety[' + i + '].siesty_rocnik" type="number" min="1" max="5" value><span class="field-validation-valid text-danger" data-valmsg-for="predmety[' + i + '].siesty_rocnik" data-valmsg-replace="true"></span></td></tr>';
+                + '<td><input class="form-control" data-val="true" data-msg-min="Hodnota musí byť => 1" data-msg-max="Hodnota musí byť <= 5" id="predmety_' + i + '__prvy_rocnik" name="predmety[' + i + '].prvy_rocnik" type="number" min="1" max="5" value><span class="field-validation-valid text-danger" data-valmsg-for="predmety[' + i + '].prvy_rocnik" data-valmsg-replace="true"></span></td>'
+                + '<td><input class="form-control" data-val="true" data-msg-min="Hodnota musí byť => 1" data-msg-max="Hodnota musí byť <= 5" id="predmety_' + i + '__druhy_rocnik" name="predmety[' + i + '].druhy_rocnik" type="number" min="1" max="5" value><span class="field-validation-valid text-danger" data-valmsg-for="predmety[' + i + '].druhy_rocnik" data-valmsg-replace="true"></span></td>'
+                + '<td><input class="form-control" data-val="true" data-msg-min="Hodnota musí byť => 1" data-msg-max="Hodnota musí byť <= 5" id="predmety_' + i + '__treti_rocnik" name="predmety[' + i + '].treti_rocnik" type="number" min="1" max="5" value><span class="field-validation-valid text-danger" data-valmsg-for="predmety[' + i + '].treti_rocnik" data-valmsg-replace="true"></span></td>'
+                + '<td><input class="form-control" data-val="true" data-msg-min="Hodnota musí byť => 1" data-msg-max="Hodnota musí byť <= 5" id="predmety_' + i + '__stvrty_rocnik" name="predmety[' + i + '].stvrty_rocnik" type="number" min="1" max="5" value><span class="field-validation-valid text-danger" data-valmsg-for="predmety[' + i + '].stvrty_rocnik" data-valmsg-replace="true"></span></td>'
+                + '<td><input class="form-control" data-val="true" data-msg-min="Hodnota musí byť => 1" data-msg-max="Hodnota musí byť <= 5" id="predmety_' + i + '__piaty_rocnik" name="predmety[' + i + '].piaty_rocnik" type="number" min="1" max="5" value><span class="field-validation-valid text-danger" data-valmsg-for="predmety[' + i + '].piaty_rocnik" data-valmsg-replace="true"></span></td>'
+                + '<td><input class="form-control" data-val="true" data-msg-min="Hodnota musí byť => 1" data-msg-max="Hodnota musí byť <= 5" id="predmety_' + i + '__siesty_rocnik" name="predmety[' + i + '].siesty_rocnik" type="number" min="1" max="5" value><span class="field-validation-valid text-danger" data-valmsg-for="predmety[' + i + '].siesty_rocnik" data-valmsg-replace="true"></span></td></tr>';
             $("#predmety tbody").append(newRowContent);
-            i = i + 1;
+            i++;
         });
     });
 </script>
