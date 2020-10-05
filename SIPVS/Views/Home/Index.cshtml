@@ -195,6 +195,13 @@ new SelectListItem {Text = "Žena", Value = "Žena"}
             <button class="btn btn-default" type="submit" name="action" value="display">Zobraz vygenerovaný dokument</button>
             <button class="btn btn-default" type="button" onclick="location.href='@Url.Action("Index", "Home")'">Reset údajov vo formulári</button>
         </div>
+
+        <div style="font-family: Times New Roman;">
+            @if (ViewBag.htmlString != null)
+            {
+                @Html.Raw(ViewBag.htmlString)
+            }
+        </div>
     </div>
 }
 
