@@ -6,7 +6,9 @@ using System.Threading;
 using System.Web;
 using System.Web.Mvc;
 using System.Xml;
+using System.Xml.Schema;
 using SIPVS.Models;
+using System.Xml.Linq;
 
 namespace SIPVS.Controllers
 {
@@ -99,14 +101,23 @@ namespace SIPVS.Controllers
 
                 case "validate":
                     //otvori sa subor Student.xml
-                    //validuje sa
-                    //ak validacia je ok
-                    ViewBag.message = "XML súbor je valídny.";
-                    //ak validacia nie je ok
-                    ViewBag.message = "XML súbor nie je valídny.";
+                    XmlSchemaSet schemas = new XmlSchemaSet();
+                    schemas.Add("", AppDomain.CurrentDomain.BaseDirectory + "Schemas/schema.xsd");
+
+                    XDocument doc = XDocument.Load(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + "//Student.xml");
+
+                    bool errors = false;
+                    doc.Validate(schemas, (o, e) =>
+                    {
+                        ViewBag.message = "XML súbor nie je valídny. Chyba: " + e.Message;
+                        errors = true;
+                    });
+                    if (!errors)
+                        ViewBag.message = "XML súbor je valídny.";
+
                     return View(student);
 
-                    
+
                 case "display":
                     //otvorí xml v prehliadaci na novej karte : automaticky by sa to malo vygenerovat s novym vzhladom
                     ViewBag.message = "PDF bolo vygenerované.";
