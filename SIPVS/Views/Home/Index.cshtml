@@ -25,10 +25,6 @@ new SelectListItem {Text = "Žena", Value = "Žena"}
                 <h2 style="color:red;">@ViewBag.message</h2>
             }
 
-
-
-
-
             <h3>Údaje o študentovi</h3>
             @Html.ValidationSummary(true, "", new { @class = "text-danger" })
 
@@ -132,7 +128,6 @@ new SelectListItem {Text = "Žena", Value = "Žena"}
                     </tr>
                 </thead>
                 <tbody>
-
                     @{int pocet = 0;}
                     @if (Model.predmety != null)
                     {
@@ -141,8 +136,6 @@ new SelectListItem {Text = "Žena", Value = "Žena"}
 
                     @for (var i = 0; i < pocet; i++)
                     {
-
-
                         <tr>
                             <td>
                                 @Html.TextBoxFor(m => m.predmety[i].nazov, new { @class = "form-control" })
@@ -189,22 +182,13 @@ new SelectListItem {Text = "Žena", Value = "Žena"}
                 <input type="hidden" id="PassingToJavaScript1" value=@pocet>
             </div>
 
-
             <button class="btn btn-default" type="submit" name="action" value="submit">Generuj XML</button>
             <button class="btn btn-default" type="submit" name="action" value="validate">Validuj vygenerované XML</button>
-            <button class="btn btn-default" type="submit" name="action" value="display">Zobraz vygenerovaný dokument</button>
+            <button class="btn btn-default" type="button" onclick="location.href='@Url.Action("Application", "Home")'" target="_blank">Ulož vygenerovaný dokument</button>
             <button class="btn btn-default" type="button" onclick="location.href='@Url.Action("Index", "Home")'">Reset údajov vo formulári</button>
-        </div>
-
-        <div style="font-family: Times New Roman;">
-            @if (ViewBag.htmlString != null)
-            {
-                @Html.Raw(ViewBag.htmlString)
-            }
         </div>
     </div>
 }
-
 
 <script>
     $(document).ready(function () {
@@ -216,7 +200,6 @@ new SelectListItem {Text = "Žena", Value = "Žena"}
             yearRange: '-90:+0',
             dateFormat: 'dd.mm.yy'
         });
-
 
         $.validator.addMethod('date',
             function (value, element, params) {
@@ -234,8 +217,6 @@ new SelectListItem {Text = "Žena", Value = "Žena"}
                 return ok;
             });
 
-
-
         var i = document.getElementById('PassingToJavaScript1').value;
         $("#add-tablerow").click(function () {
             var newRowContent =
@@ -251,7 +232,6 @@ new SelectListItem {Text = "Žena", Value = "Žena"}
         });
     });
 </script>
-
 
 <script>
 

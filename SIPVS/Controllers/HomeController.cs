@@ -31,9 +31,7 @@ namespace SIPVS.Controllers
 
             switch (action)
             {
-              case "submit":
-                    
-                    
+                case "submit":
                     List<int?> prvy = new List<int?>();
                     List<int?> druhy = new List<int?>();
                     List<int?> treti = new List<int?>();
@@ -125,22 +123,20 @@ namespace SIPVS.Controllers
                         ViewBag.message = "XML súbor je valídny.";
 
                     return View(student);
-
-
-                case "display":
-                    string xml = System.IO.File.ReadAllText(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + "//Student.xml");
-                    string xsltPath = AppDomain.CurrentDomain.BaseDirectory + "Schemas/view.xsl"; //path of xslt file
-
-                    ViewBag.htmlString = CustomHTMLHelper.RenderXMLData(xml, xsltPath);
-
-                    return View(student);
-
-                
-
             }
             return View(student);
         }
 
+        public ActionResult Application()
+        {
+            string xml = System.IO.File.ReadAllText(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + "//Student.xml");
+            string xsltPath = AppDomain.CurrentDomain.BaseDirectory + "Schemas/view.xsl"; //path of xslt file
+
+            ViewBag.htmlString = CustomHTMLHelper.RenderXMLData(xml, xsltPath).ToString();
+            System.IO.File.WriteAllText(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + "//Student.html", ViewBag.htmlString);
+
+            return View();
+        }
     }
 }
 
