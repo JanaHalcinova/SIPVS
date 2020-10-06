@@ -32,7 +32,7 @@ namespace SIPVS.Controllers
             switch (action)
             {
               case "submit":
-                    Priemerny_predmet priemer = new Priemerny_predmet();
+                    
                     
                     List<int?> prvy = new List<int?>();
                     List<int?> druhy = new List<int?>();
@@ -40,6 +40,10 @@ namespace SIPVS.Controllers
                     List<int?> stvrty = new List<int?>();
                     List<int?> piaty = new List<int?>();
                     List<int?> siesty = new List<int?>();
+
+                    if (student.predmety != null)
+                    {
+                    Priemerny_predmet priemer = new Priemerny_predmet();
                     foreach (var predmet in student.predmety)
                     {
                         if (predmet.prvy_rocnik!= null)
@@ -93,6 +97,7 @@ namespace SIPVS.Controllers
                     }
 
                     student.priemer = priemer;
+                    }
                     System.Xml.Serialization.XmlSerializer writer =
                         new System.Xml.Serialization.XmlSerializer(typeof(Student));
 
