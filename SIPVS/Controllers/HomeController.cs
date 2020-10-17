@@ -123,6 +123,13 @@ namespace SIPVS.Controllers
                         ViewBag.message = "XML súbor je valídny.";
 
                     return View(student);
+
+                case "sign":
+                    //otvori sa subor Student.xml
+                    var inputString = "HAHAHA123"; 
+                    var plainTextBytes = System.Text.Encoding.UTF8.GetBytes(inputString);
+                    var result = System.Convert.ToBase64String(plainTextBytes);
+                    return null;
             }
             return View(student);
         }
