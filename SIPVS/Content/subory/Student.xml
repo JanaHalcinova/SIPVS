@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+<Student xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" Pohlavie="Muž">
+  <Rok_od>2020</Rok_od>
+  <Rok_do>2010</Rok_do>
+  <Meno>Jana</Meno>
+  <priezvisko>Halčinová</priezvisko>
+  <rodne_priezvisko>Halčinová</rodne_priezvisko>
+  <datum_narodenia>2020-10-09T00:00:00</datum_narodenia>
+  <miesto_narodenia>trstena</miesto_narodenia>
+  <stat>Slovensko</stat>
+  <rodne_cislo>970812/4311</rodne_cislo>
+  <telefon>0903666639</telefon>
+  <email>halcinovajana@gmail.com</email>
+</Student>

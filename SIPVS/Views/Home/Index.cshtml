@@ -248,8 +248,8 @@ new SelectListItem {Text = "Žena", Value = "Žena"}
                     console.log(ditec.dSigXadesJs);
 
                     //Podpis TXT suborov
-
-                    /*ditec.dSigXadesJs.addTxtObject("objectId", "objectDescription", "Hello world", "http://objectFormatIdentifier", new Callback(function () {
+                    /*
+                    ditec.dSigXadesJs.addTxtObject("objectId", "objectDescription", "Hello world", "http://objectFormatIdentifier", new Callback(function () {
 
                         ditec.dSigXadesJs.sign20("signatureId", "http://www.w3.org/2001/04/xmlenc#sha256", "urn:oid:1.3.158.36061701.1.2.2", "dataEnvelopeId", "http://dataEnvelopeURI", "dataEnvelopeDescr", new Callback(function () {
 
@@ -257,45 +257,49 @@ new SelectListItem {Text = "Žena", Value = "Žena"}
                                 alert(ret);
                             }));
                         }));
-                    }));*/
+                    })); */
 
                     //Podpis XML suborov
 
-                    var objectId = $("#tabXmlPlugin [name=objectId]").val();//doplnit hodnotu
-                    var objectDescription = $("#tabXmlPlugin [name=objectDescription]").val();//doplnit hodnotu
-                    var namespaceUri = $("#tabXmlPlugin [name=namespaceUri]").val();//doplnit hodnotu
-                    var xsdReference = $("#tabXmlPlugin [name=xsdReference]").val();//doplnit hodnotu
-                    var xslReference = $("#tabXmlPlugin [name=xslReference]").val();//doplnit hodnotu
+                    var objectId = "objectId";//doplnit hodnotu
+                    var objectDescription = "objectDescription";//doplnit hodnotu
+                    var namespaceUri = "";//doplnit hodnotu
+                    //http://www.w3.org/2001/xhtml
+                    var xsdReference = "http://www.w3.org/2001/XMLSchema";//doplnit hodnotu
+                    var xslReference = "http://www.w3.org/1999/XSL/Transform";//doplnit hodnotu
                     var xmlVersion = "20";//10 pre verziu 1.0, 11 pre verziu 1.1, 20 pre XML verziu 2.0
-                    var visualTransformType = "TXT";//HTML alebo TXT
-                    var contentXml = $("#tabXmlPlugin [name=contentXml]").dataInput("value");//doplnit hodnotu
-                    var contentXsd = $("#tabXmlPlugin [name=contentXsd]").dataInput("value");//doplnit hodnotu
-                    var contentXslt = $("#tabXmlPlugin [name=contentXslt]").dataInput("value");//doplnit hodnotu
+                    var visualTransformType = "HTML";//HTML alebo TXT
+                   
+                    $.get("../Content/subory/Student.xml", function (contentXml) {
+                        $.get("../Content/subory/schema.xsd", function (contentXsd) {
+                            $.get("../Content/subory/view.xsl", function (contentXslt) {
+                                if (xmlVersion == "20") {
+                                    ditec.dSigXadesJs.addXmlObject2(objectId, objectDescription, contentXml.documentElement.outerHTML, contentXsd.documentElement.outerHTML, namespaceUri, xsdReference, contentXslt.documentElement.outerHTML, xslReference, visualTransformType, new Callback(function () {
 
-                    if (xmlVersion == "20") {
-                        ditec.dSigXadesJs.addXmlObject2(objectId, objectDescription, contentXml, contentXsd, namespaceUri, xsdReference, contentXslt, xslReference, visualTransformType, new Callback(function () {
+                                        if (xmlVersion == "20") {//sign11 pre podpis v XML verzii 1.1, sign20 pre podpis v XML verzii 2.0
+                                            ditec.dSigXadesJs.sign20("signatureId", "http://www.w3.org/2001/04/xmlenc#sha256", "urn:oid:1.3.158.36061701.1.2.2", "dataEnvelopeId", "http://dataEnvelopeURI", "dataEnvelopeDescr", new Callback(function () {
 
-                            if (xmlVersion == "20") {//sign11 pre podpis v XML verzii 1.1, sign20 pre podpis v XML verzii 2.0
-                                ditec.dSigXadesJs.sign20("signatureId", "http://www.w3.org/2001/04/xmlenc#sha256", "urn:oid:1.3.158.36061701.1.2.2", "dataEnvelopeId", "http://dataEnvelopeURI", "dataEnvelopeDescr", new Callback(function () {
+                                                ditec.dSigXadesJs.getSignedXmlWithEnvelopeBase64(new Callback(function (ret) {
+                                                    alert(ret);
+                                                }));
+                                            }));
+                                        }
 
-                                    ditec.dSigXadesJs.getSignedXmlWithEnvelopeBase64(new Callback(function (ret) {
-                                        alert(ret);
                                     }));
-                                }));
-                            }
+                                } else {
+                                    ditec.dSigXadesJs.addXmlObject(objectId, objectDescription, contentXml.documentElement.outerHTML, contentXsd.documentElement.outerHTML, namespaceUri, xsdReference, contentXslt.documentElement.outerHTML, xslReference, new Callback(function () {
 
-                        }));
-                    } else {
-                        ditec.dSigXadesJs.addXmlObject(objectId, objectDescription, contentXml, contentXsd, namespaceUri, xsdReference, contentXslt, xslReference, new Callback(function () {
+                                        ditec.dSigXadesJs.sign("signatureId", "http://www.w3.org/2001/04/xmlenc#sha256", "urn:oid:1.3.158.36061701.1.2.2", new Callback(function () {
 
-                            ditec.dSigXadesJs.sign("signatureId", "http://www.w3.org/2001/04/xmlenc#sha256", "urn:oid:1.3.158.36061701.1.2.2", new Callback(function () {
-
-                                ditec.dSigXadesJs.getSignedXmlWithEnvelopeBase64(new Callback(function (ret) {
-                                    alert(ret);
-                                }));
-                            }));
-                        }));
-                    }
+                                            ditec.dSigXadesJs.getSignedXmlWithEnvelopeBase64(new Callback(function (ret) {
+                                                alert(ret);
+                                            }));
+                                        }));
+                                    }));
+                                }
+                            })
+                        })
+                    })
 
                     /*ditec.dSigXadesJs.getSignedXmlWithEnvelopeBase64(new common.Callback(function (ret) {
                         $("#txtResult").dataOutput("value", ret, true, "xml");
