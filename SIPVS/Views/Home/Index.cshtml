@@ -186,7 +186,7 @@ new SelectListItem {Text = "Žena", Value = "Žena"}
             <button class="btn btn-default" type="submit" name="action" value="validate">Validuj vygenerované XML</button>
             <button class="btn btn-default" type="button" onclick="location.href='@Url.Action("Application", "Home")'" target="_blank">Ulož vygenerovaný dokument</button>
             <button class="btn btn-default" type="button" onclick="location.href='@Url.Action("Index", "Home")'">Reset údajov vo formulári</button>
-            <button id="signButton" class="btn btn-default" type="submit" name="action" value="sign">Podpísať</button>
+            <button id="signButton" class="btn btn-default" type="button" name="action" value="sign">Podpísať</button>
         </div>
     </div>
 }
@@ -281,6 +281,7 @@ new SelectListItem {Text = "Žena", Value = "Žena"}
 
                                                 ditec.dSigXadesJs.getSignedXmlWithEnvelopeBase64(new Callback(function (ret) {
                                                     alert(ret);
+                                                    window.location.href = '@Url.Action("Sign", "HomeController")/' + ret;
                                                 }));
                                             }));
                                         }

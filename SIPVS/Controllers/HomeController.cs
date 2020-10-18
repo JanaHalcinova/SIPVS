@@ -134,6 +134,15 @@ namespace SIPVS.Controllers
             return View(student);
         }
 
+
+        public ActionResult Sign(string ret)
+        {
+            var plainTextBytes = System.Text.Encoding.UTF8.GetBytes(ret);
+            var result = System.Convert.ToBase64String(plainTextBytes);
+
+            return View();
+        }
+
         public ActionResult Application()
         {
             string xml = System.IO.File.ReadAllText(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + "//Student.xml");

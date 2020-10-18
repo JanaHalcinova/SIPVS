@@ -175,9 +175,6 @@ xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 				</tr>
 				</xsl:if>
 				</xsl:for-each>
-				<script>
-					var table = document.getElementById("t_predmety"), avgVal, sumVal=0, rowCount=table.rows
-				</script>
 				<tr>
 					<td><b>Priemerný prospech</b> (uviesť na dve desatinné miesta)</td>
 					<td style="text-align:center;font-weight:bold;"><xsl:value-of select="priemer/prvy_rocnik"/></td>
