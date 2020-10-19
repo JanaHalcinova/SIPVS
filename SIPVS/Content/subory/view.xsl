@@ -163,27 +163,27 @@ xmlns:zzz="http://fiit.stu.sk/SIPVS/UniversityApplication">
 					<td style="width:50px;text-align:center;"><b>V.</b></td>
 					<td style="width:50px;text-align:center;"><b>VI.</b></td>
 				</tr>
-				<xsl:for-each select="predmety/Predmet">
-				<xsl:if test="Nazov">
+				<xsl:for-each select="zzz:predmety/zzz:Predmet">
+				<xsl:if test="zzz:Nazov">
 				<tr>
-					<td><xsl:value-of select="Nazov"/></td>
-					<td style="text-align:center;"><xsl:value-of select="prvy_rocnik"/></td>
-					<td style="text-align:center;"><xsl:value-of select="druhy_rocnik"/></td>
-					<td style="text-align:center;"><xsl:value-of select="treti_rocnik"/></td>
-					<td style="text-align:center;"><xsl:value-of select="stvrty_rocnik"/></td>
-					<td style="text-align:center;"><xsl:value-of select="piaty_rocnik"/></td>
-					<td style="text-align:center;"><xsl:value-of select="siesty_rocnik"/></td>
+					<td><xsl:value-of select="zzz:Nazov"/></td>
+					<td style="text-align:center;"><xsl:value-of select="zzz:prvy_rocnik"/></td>
+					<td style="text-align:center;"><xsl:value-of select="zzz:druhy_rocnik"/></td>
+					<td style="text-align:center;"><xsl:value-of select="zzz:treti_rocnik"/></td>
+					<td style="text-align:center;"><xsl:value-of select="zzz:stvrty_rocnik"/></td>
+					<td style="text-align:center;"><xsl:value-of select="zzz:piaty_rocnik"/></td>
+					<td style="text-align:center;"><xsl:value-of select="zzz:siesty_rocnik"/></td>
 				</tr>
 				</xsl:if>
 				</xsl:for-each>
 				<tr>
 					<td><b>Priemerný prospech</b> (uviesť na dve desatinné miesta)</td>
-					<td style="text-align:center;font-weight:bold;"><xsl:value-of select="priemer/prvy_rocnik"/></td>
-					<td style="text-align:center;font-weight:bold;"><xsl:value-of select="priemer/druhy_rocnik"/></td>
-					<td style="text-align:center;font-weight:bold;"><xsl:value-of select="priemer/treti_rocnik"/></td>
-					<td style="text-align:center;font-weight:bold;"><xsl:value-of select="priemer/stvrty_rocnik"/></td>
-					<td style="text-align:center;font-weight:bold;"><xsl:value-of select="priemer/piaty_rocnik"/></td>
-					<td style="text-align:center;font-weight:bold;"><xsl:value-of select="priemer/siesty_rocnik"/></td>
+					<td style="text-align:center;font-weight:bold;"><xsl:value-of select="zzz:priemer/zzz:prvy_rocnik"/></td>
+					<td style="text-align:center;font-weight:bold;"><xsl:value-of select="zzz:priemer/zzz:druhy_rocnik"/></td>
+					<td style="text-align:center;font-weight:bold;"><xsl:value-of select="zzz:priemer/zzz:treti_rocnik"/></td>
+					<td style="text-align:center;font-weight:bold;"><xsl:value-of select="zzz:priemer/zzz:stvrty_rocnik"/></td>
+					<td style="text-align:center;font-weight:bold;"><xsl:value-of select="zzz:priemer/zzz:piaty_rocnik"/></td>
+					<td style="text-align:center;font-weight:bold;"><xsl:value-of select="zzz:priemer/zzz:siesty_rocnik"/></td>
 				</tr>
 			</table>
 
