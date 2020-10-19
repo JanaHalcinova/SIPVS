@@ -147,6 +147,12 @@ namespace SIPVS.Controllers
 
             System.IO.File.WriteAllText(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + "//xades.xml", xadesXml);
 
+            return RedirectToAction("SignXml", "Home");
+        }
+
+        public ActionResult SignXml()
+        {
+            
             return View();
         }
 
