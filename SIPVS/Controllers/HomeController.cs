@@ -72,27 +72,27 @@ namespace SIPVS.Controllers
                     }
                     if (prvy.Count > 0)
                     {
-                        priemer.prvy_rocnik = prvy.Average();
+                        priemer.prvy_rocnik = prvy.Average().HasValue ? Math.Round(prvy.Average().Value, 2) : 0;
                     }
                     if (druhy.Count > 0)
                     {
-                        priemer.druhy_rocnik = druhy.Average();
+                        priemer.druhy_rocnik = druhy.Average().HasValue ? Math.Round(druhy.Average().Value, 2) : 0;
                     }
                     if (treti.Count > 0)
                     {
-                        priemer.treti_rocnik = treti.Average();
+                        priemer.treti_rocnik = treti.Average().HasValue ? Math.Round(treti.Average().Value, 2) : 0;
                     }
                     if (stvrty.Count > 0)
                     {
-                        priemer.stvrty_rocnik = stvrty.Average();
+                        priemer.stvrty_rocnik = stvrty.Average().HasValue ? Math.Round(stvrty.Average().Value, 2) : 0;
                     }
                     if (piaty.Count > 0)
                     {
-                        priemer.piaty_rocnik = piaty.Average();
+                        priemer.piaty_rocnik = piaty.Average().HasValue ? Math.Round(piaty.Average().Value, 2) : 0;
                     }
                     if (siesty.Count > 0)
                     {
-                        priemer.siesty_rocnik = siesty.Average();
+                        priemer.siesty_rocnik = siesty.Average().HasValue ? Math.Round(siesty.Average().Value, 2) : 0;
                     }
 
                     student.priemer = priemer;
