@@ -11,6 +11,7 @@ using SIPVS.Models;
 using System.Xml.Linq;
 using System.Xml.Xsl;
 using System.IO;
+using System.Xml.Serialization;
 
 namespace SIPVS.Controllers
 {
@@ -99,6 +100,8 @@ namespace SIPVS.Controllers
                     System.Xml.Serialization.XmlSerializer writer =
                         new System.Xml.Serialization.XmlSerializer(typeof(Student));
 
+                    var ns = new XmlSerializerNamespaces();
+                    ns.Add(String.Empty, "http://fiit.stu.sk/SIPVS/UniversityApplication");
                     var path = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + "//Student.xml";
                     System.IO.FileStream file = System.IO.File.Create(path);
                     writer.Serialize(file, student);
@@ -109,7 +112,7 @@ namespace SIPVS.Controllers
                 case "validate":
                     //otvori sa subor Student.xml
                     XmlSchemaSet schemas = new XmlSchemaSet();
-                    schemas.Add("", AppDomain.CurrentDomain.BaseDirectory + "Schemas/schema.xsd");
+                    schemas.Add("http://fiit.stu.sk/SIPVS/UniversityApplication", AppDomain.CurrentDomain.BaseDirectory + "Schemas/schema.xsd");
 
                     XDocument doc = XDocument.Load(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + "//Student.xml");
 
@@ -145,9 +148,15 @@ namespace SIPVS.Controllers
 
         public ActionResult Application()
         {
-            string xml = System.IO.File.ReadAllText(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + "//Student.xml");
+            string xml_view = AppDomain.CurrentDomain.BaseDirectory + "Schemas/xml_view.xsl"; //path of xslt file
             string xsltPath = AppDomain.CurrentDomain.BaseDirectory + "Schemas/view.xsl"; //path of xslt file
+            var path_new = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + "//Student_new.xml";
 
+            XslCompiledTransform xslt = new XslCompiledTransform();
+            xslt.Load(xml_view);
+            xslt.Transform(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + "//Student.xml", path_new);
+
+            string xml = System.IO.File.ReadAllText(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + "//Student_new.xml");
             ViewBag.htmlString = CustomHTMLHelper.RenderXMLData(xml, xsltPath).ToString();
             System.IO.File.WriteAllText(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + "//Student.html", ViewBag.htmlString);
 

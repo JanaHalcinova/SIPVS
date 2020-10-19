@@ -8,6 +8,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace SIPVS.Models
 {
+    [XmlRoot(Namespace = "http://fiit.stu.sk/SIPVS/UniversityApplication")]
     public class Student
     {
         [XmlElement("Rok_od")]
