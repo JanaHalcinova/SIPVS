@@ -1,7 +1,8 @@
 <xsl:stylesheet version="1.0"
-xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
+xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+xmlns:zzz="http://fiit.stu.sk/SIPVS/UniversityApplication">
 
-<xsl:template match="/Student">
+<xsl:template match="zzz:Student">
 	<html>
 		<head>
 			<style>
@@ -56,41 +57,41 @@ xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 				<!--2-->
 				<tr>
 					<th class="no-right-border" style="width:120px;">Akademický rok:</th>
-					<td class="no-horizontal-border"><xsl:value-of select="Rok_od"/></td>
+					<td class="no-horizontal-border"><xsl:value-of select="zzz:Rok_od"/></td>
 					<td class="no-horizontal-border">/</td>
-					<td class="no-left-border" colspan="4"><xsl:value-of select="Rok_do"/></td>
+					<td class="no-left-border" colspan="4"><xsl:value-of select="zzz:Rok_do"/></td>
 				</tr>
 				<!--3-->
 				<tr>
 					<th class="no-right-border">Štátne občianstvo:</th>
-					<td class="no-left-border" colspan="6"><xsl:value-of select="stat"/></td>
+					<td class="no-left-border" colspan="6"><xsl:value-of select="zzz:stat"/></td>
 				</tr>
 				<!--4-->
 				<tr>
 					<th class="no-right-border">Meno:</th>
-					<td class="no-horizontal-border" colspan="2"><xsl:value-of select="Meno"/></td>
+					<td class="no-horizontal-border" colspan="2"><xsl:value-of select="zzz:Meno"/></td>
 					<th class="no-horizontal-border" colspan="2">Priezvisko:</th>
-					<td class="no-left-border"       colspan="2"><xsl:value-of select="priezvisko"/></td>
+					<td class="no-left-border"       colspan="2"><xsl:value-of select="zzz:priezvisko"/></td>
 					<td class="no-right-border"      colspan="2">Dátum doručenia:</td>
 					<td class="no-left-border"       colspan="4">1.10.2020</td>
 				</tr>
 				<!--5-->
 				<tr>
 					<th class="no-right-border">Rodné priezvisko:</th>
-					<td class="no-left-border"  colspan="6"><xsl:value-of select="rodne_priezvisko"/></td>
+					<td class="no-left-border"  colspan="6"><xsl:value-of select="zzz:rodne_priezvisko"/></td>
 					<th class="no-right-border" colspan="2">Akademický titul:</th>
-					<td class="no-left-border"  colspan="4"><xsl:value-of select="titul"/></td>
+					<td class="no-left-border"  colspan="4"><xsl:value-of select="zzz:titul"/></td>
 				</tr>
 				<!--6-->
 
 				<tr>
 					<th class="no-right-border">Dátum narodenia:</th>
 					<td class="no-horizontal-border">deň</td>
-					<td class="no-horizontal-border"><xsl:value-of select="substring(datum_narodenia, 9, 2)"/></td>
+					<td class="no-horizontal-border"><xsl:value-of select="substring(zzz:datum_narodenia, 9, 2)"/></td>
 					<td class="no-horizontal-border">mesiac</td>
-					<td class="no-horizontal-border"><xsl:value-of select="substring(datum_narodenia, 6, 2)"/></td>
+					<td class="no-horizontal-border"><xsl:value-of select="substring(zzz:datum_narodenia, 6, 2)"/></td>
 					<td class="no-horizontal-border">rok</td>
-					<td class="no-left-border"><xsl:value-of select="substring(datum_narodenia, 1, 4)"/></td>
+					<td class="no-left-border"><xsl:value-of select="substring(zzz:datum_narodenia, 1, 4)"/></td>
 					<th class="no-right-border">Pohlavie<sup>2)</sup>:</th>
 					<td class="no-horizontal-border"></td>
 					<td class="no-left-border">muž</td>
@@ -125,22 +126,22 @@ xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 				<!--7-->
 				<tr>
 					<th class="no-right-border">Miesto narodenia:</th>
-					<td class="no-left-border" colspan="5"><xsl:value-of select="miesto_narodenia"/></td>
+					<td class="no-left-border" colspan="5"><xsl:value-of select="zzz:miesto_narodenia"/></td>
 					<th class="no-right-border">Štát:</th>
-					<td class="no-left-border" colspan="6"><xsl:value-of select="stat"/></td>
+					<td class="no-left-border" colspan="6"><xsl:value-of select="zzz:stat"/></td>
 				</tr>
 				<!--8-->
 				<tr>
 					<th class="no-right-border">Rodné číslo<sup>3)</sup>:</th>
-					<td class="no-left-border" colspan="5"><xsl:value-of select="rodne_cislo"/></td>
+					<td class="no-left-border" colspan="5"><xsl:value-of select="zzz:rodne_cislo"/></td>
 					<td colspan="7"></td>
 				</tr>
 				<!--9-->
 				<tr>
 					<th class="no-right-border">Tel. č.<sup>4)</sup>:</th>
-					<td class="no-left-border"  colspan="5"><xsl:value-of select="telefon"/></td>
+					<td class="no-left-border"  colspan="5"><xsl:value-of select="zzz:telefon"/></td>
 					<th class="no-right-border" colspan="2">E-mailová adresa<sup>4)</sup>:</th>
-					<td class="no-left-border"  colspan="5"><xsl:value-of select="email"/></td>
+					<td class="no-left-border"  colspan="5"><xsl:value-of select="zzz:email"/></td>
 				</tr>
 			</table>
 

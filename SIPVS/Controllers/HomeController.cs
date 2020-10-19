@@ -152,6 +152,7 @@ namespace SIPVS.Controllers
 
         public ActionResult Application()
         {
+            /*
             string xml_view = AppDomain.CurrentDomain.BaseDirectory + "Content/subory/xml_view.xsl"; //path of xslt file
             string xsltPath = AppDomain.CurrentDomain.BaseDirectory + "Content/subory/view.xsl"; //path of xslt file
             var path_new = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + "//Student_new.xml";
@@ -161,6 +162,13 @@ namespace SIPVS.Controllers
             xslt.Transform(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + "//Student.xml", path_new);
 
             string xml = System.IO.File.ReadAllText(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + "//Student_new.xml");
+            ViewBag.htmlString = CustomHTMLHelper.RenderXMLData(xml, xsltPath).ToString();
+            System.IO.File.WriteAllText(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + "//Student.html", ViewBag.htmlString);
+            */
+
+            string xml = System.IO.File.ReadAllText(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + "//Student.xml");
+            string xsltPath = AppDomain.CurrentDomain.BaseDirectory + "Content/subory/view.xsl"; //path of xslt file
+
             ViewBag.htmlString = CustomHTMLHelper.RenderXMLData(xml, xsltPath).ToString();
             System.IO.File.WriteAllText(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + "//Student.html", ViewBag.htmlString);
 
