@@ -112,7 +112,7 @@ namespace SIPVS.Controllers
                 case "validate":
                     //otvori sa subor Student.xml
                     XmlSchemaSet schemas = new XmlSchemaSet();
-                    schemas.Add("http://fiit.stu.sk/SIPVS/UniversityApplication", AppDomain.CurrentDomain.BaseDirectory + "Schemas/schema.xsd");
+                    schemas.Add("http://fiit.stu.sk/SIPVS/UniversityApplication", AppDomain.CurrentDomain.BaseDirectory + "Content/subory/schema.xsd");
 
                     XDocument doc = XDocument.Load(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + "//Student.xml");
 
@@ -148,8 +148,8 @@ namespace SIPVS.Controllers
 
         public ActionResult Application()
         {
-            string xml_view = AppDomain.CurrentDomain.BaseDirectory + "Schemas/xml_view.xsl"; //path of xslt file
-            string xsltPath = AppDomain.CurrentDomain.BaseDirectory + "Schemas/view.xsl"; //path of xslt file
+            string xml_view = AppDomain.CurrentDomain.BaseDirectory + "Content/subory/xml_view.xsl"; //path of xslt file
+            string xsltPath = AppDomain.CurrentDomain.BaseDirectory + "Content/subory/view.xsl"; //path of xslt file
             var path_new = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + "//Student_new.xml";
 
             XslCompiledTransform xslt = new XslCompiledTransform();
