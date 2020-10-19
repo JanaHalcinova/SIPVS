@@ -137,11 +137,15 @@ namespace SIPVS.Controllers
             return View(student);
         }
 
-
+        [HttpPost]
         public ActionResult Sign(string ret)
         {
-            var plainTextBytes = System.Text.Encoding.UTF8.GetBytes(ret);
-            var result = System.Convert.ToBase64String(plainTextBytes);
+            byte[] data = System.Convert.FromBase64String(ret);
+            string xadesXml = System.Text.Encoding.UTF8.GetString(data);
+
+            ViewBag.signString = xadesXml;
+
+            System.IO.File.WriteAllText(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + "//xades.xml", xadesXml);
 
             return View();
         }

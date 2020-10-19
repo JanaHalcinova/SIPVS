@@ -1,7 +1,9 @@
-﻿
-@{
+﻿@{
     ViewBag.Title = "Sign";
 }
 
 <h2>Sign</h2>
-
+@if (ViewBag.signString != null)
+{
+    @Html.Raw(ViewBag.signString)
+}

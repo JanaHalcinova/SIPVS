@@ -281,7 +281,17 @@ new SelectListItem {Text = "Žena", Value = "Žena"}
 
                                                 ditec.dSigXadesJs.getSignedXmlWithEnvelopeBase64(new Callback(function (ret) {
                                                     alert(ret);
-                                                    window.location.href = '@Url.Action("Sign", "HomeController")/' + ret;
+
+                                                    $.post('@Url.Action("Sign", "Home")', { ret: ret }, function (result) {
+                                                        console.log("inside sucess");
+                                                        console.log("result: " + result);
+                                                        //document.write(result);
+                                                        alert('Dokument bol úspešne podpísaný a uložený do priečinka /Documents');
+                                                        //window.location.href = 'Url.Action("Sign", "Home")';
+                                                    });
+
+                                                    //localStorage.setItem('ret', ret);
+                                                    //window.document.location = './Sign';
                                                 }));
                                             }));
                                         }
