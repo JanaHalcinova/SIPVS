@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<Student xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" Pohlavie="Muž">
+<Student xmlns="http://fiit.stu.sk/SIPVS/UniversityApplication" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" Pohlavie="Muž">
   <Rok_od>2020</Rok_od>
   <Rok_do>2010</Rok_do>
   <Meno>Jana</Meno>
