@@ -11,7 +11,9 @@ using SIPVS.Models;
 using System.Xml.Linq;
 using System.Xml.Xsl;
 using System.IO;
+using System.Net;
 using System.Xml.Serialization;
+using Org.BouncyCastle.Tsp;
 
 namespace SIPVS.Controllers
 {
@@ -133,6 +135,11 @@ namespace SIPVS.Controllers
                     var plainTextBytes = System.Text.Encoding.UTF8.GetBytes(inputString);
                     var result = System.Convert.ToBase64String(plainTextBytes);
                     return null;
+
+                case "timestamp":
+
+                    return View(student);
+
             }
             return View(student);
         }
@@ -179,6 +186,87 @@ namespace SIPVS.Controllers
             System.IO.File.WriteAllText(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + "//Student.html", ViewBag.htmlString);
 
             return View();
+        }
+
+        public ActionResult Timestamp()
+        {
+            // hardcoded
+            String dataB64 = "PGRzOlNpZ25hdHVyZVZhbHVlIElkPSJzaWduYXR1cmVJZFNpZ25hdHVyZVZhbHVlIj5pU20zSE1lSlJUbHVkK0p5T0Vpc2cwc0RIK3pmbVFReElVQ3ducGgwUDh0ME1mY0NzdDN0WEw3UHhqdkFpc3dIYlpjc3dHMEtqZmpqDQpHc1NjaW9kMkdQSUdQOHVjR1AwbVc0RFdpQXVDNEZBcFZBUk1NWDRVWW93VCtBeVdrM1UweGN2N2w5UW1kRVNpY1hUbjcyV3dPTVpkDQoya3MydXg3SUttOTE3Y3dRN3kvVC9rZjQrVnBoNCtzU0phWkxyRGc1NkRaaWR0SGRtYVZ1dEIrdkJqa3pNRkJDaXl6ZDVWWlA3Q3lqDQpLSGpqTTZxT1NYNzJuQjJXd2V4aTVFZVJDZVRKSUJRSVBaWGVvb1FUQzJBWkdTeEtOMkFhZ1pqM09BbVNmRWFJK2JsWkNRWlNoVE9SDQoxdVNaMS8xNmZNYVBBaGh3cG52eU5RYS9LblN4dlhsSUYrbVRDdz09PC9kczpTaWduYXR1cmVWYWx1ZT4=";
+
+            XmlDocument soapEnvelopeXml = CreateSoapEnvelope(dataB64);
+            HttpWebRequest webRequest = CreateWebRequest();
+            InsertSoapEnvelopeIntoWebRequest(soapEnvelopeXml, webRequest);
+
+            // begin async call to web request.
+            IAsyncResult asyncResult = webRequest.BeginGetResponse(null, null);
+
+            // suspend this thread until call is complete. You might want to
+            // do something usefull here like update your UI.
+            asyncResult.AsyncWaitHandle.WaitOne();
+
+            // get the response from the completed web request.
+
+            string soapResult;
+            using (WebResponse webResponse = webRequest.EndGetResponse(asyncResult))
+            {
+                using (StreamReader rd = new StreamReader(webResponse.GetResponseStream()))
+                {
+                    soapResult = rd.ReadToEnd();
+                }
+                Console.Write(soapResult);
+                ViewBag.soapResult = soapResult;
+            }
+
+            XmlDocument xmlDoc = new XmlDocument();
+            xmlDoc.LoadXml(soapResult);
+
+            string timestampResultEncoded = xmlDoc.GetElementsByTagName("GetTimestampResult")[0].InnerText;
+
+            TimeStampResponse response = new TimeStampResponse(Convert.FromBase64String(timestampResultEncoded));
+            //ViewBag.soapResult = response.ToString();
+            ViewBag.soapResult = System.Text.Encoding.UTF8.GetString(response.GetEncoded());
+            var token = response.TimeStampToken;
+
+            return View();
+        }
+
+        private static HttpWebRequest CreateWebRequest()
+        {
+            HttpWebRequest webRequest = (HttpWebRequest)WebRequest.Create(@"http://test.ditec.sk/timestampws/TS.asmx?op=GetTimestamp");
+            webRequest.Headers.Add(@"SOAP:Action");
+            webRequest.ContentType = "text/xml;charset=\"utf-8\"";
+            webRequest.Accept = "text/xml";
+            webRequest.Method = "POST";
+            return webRequest;
+        }
+
+        private static XmlDocument CreateSoapEnvelope(String dataB64)
+        {
+            XmlDocument soapEnvelopeDocument = new XmlDocument();
+            String xmlString = String.Format(
+                @"<soap:Envelope
+                    xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance""
+                    xmlns:xsd=""http://www.w3.org/2001/XMLSchema""
+                    xmlns:soap=""http://schemas.xmlsoap.org/soap/envelope/"">
+                    <soap:Body>
+                      <GetTimestamp xmlns=""http://www.ditec.sk/"">
+                        <dataB64>{0}</dataB64>
+                      </GetTimestamp>
+                    </soap:Body>
+                  </soap:Envelope>",
+                dataB64
+            );
+            soapEnvelopeDocument.LoadXml(xmlString);
+
+            return soapEnvelopeDocument;
+        }
+
+        private static void InsertSoapEnvelopeIntoWebRequest(XmlDocument soapEnvelopeXml, HttpWebRequest webRequest)
+        {
+            using (Stream stream = webRequest.GetRequestStream())
+            {
+                soapEnvelopeXml.Save(stream);
+            }
         }
     }
 }

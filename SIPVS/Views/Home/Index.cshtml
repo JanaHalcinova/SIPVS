@@ -186,7 +186,8 @@ new SelectListItem {Text = "Žena", Value = "Žena"}
             <button class="btn btn-default" type="submit" name="action" value="validate">Validuj vygenerované XML</button>
             <button class="btn btn-default" type="button" onclick="location.href='@Url.Action("Application", "Home")'" target="_blank">Ulož vygenerovaný dokument</button>
             <button class="btn btn-default" type="button" onclick="location.href='@Url.Action("Index", "Home")'">Reset údajov vo formulári</button>
-            <button class="btn btn-default" type="button"  onclick="window.location= '@Url.Action( "SignXml", "Home")'">Podpísať</button>
+            <button class="btn btn-default" type="button" onclick="window.location= '@Url.Action( "SignXml", "Home")'">Podpísať</button>
+            <button class="btn btn-default" type="button" onclick="location.href='@Url.Action("Timestamp", "Home")'" target="_blank">Časová pečiatka</button>
         </div>
     </div>
 }
