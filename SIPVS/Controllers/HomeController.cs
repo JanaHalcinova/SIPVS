@@ -190,8 +190,15 @@ namespace SIPVS.Controllers
 
         public ActionResult Timestamp()
         {
-            // hardcoded
-            String dataB64 = "PGRzOlNpZ25hdHVyZVZhbHVlIElkPSJzaWduYXR1cmVJZFNpZ25hdHVyZVZhbHVlIj5pU20zSE1lSlJUbHVkK0p5T0Vpc2cwc0RIK3pmbVFReElVQ3ducGgwUDh0ME1mY0NzdDN0WEw3UHhqdkFpc3dIYlpjc3dHMEtqZmpqDQpHc1NjaW9kMkdQSUdQOHVjR1AwbVc0RFdpQXVDNEZBcFZBUk1NWDRVWW93VCtBeVdrM1UweGN2N2w5UW1kRVNpY1hUbjcyV3dPTVpkDQoya3MydXg3SUttOTE3Y3dRN3kvVC9rZjQrVnBoNCtzU0phWkxyRGc1NkRaaWR0SGRtYVZ1dEIrdkJqa3pNRkJDaXl6ZDVWWlA3Q3lqDQpLSGpqTTZxT1NYNzJuQjJXd2V4aTVFZVJDZVRKSUJRSVBaWGVvb1FUQzJBWkdTeEtOMkFhZ1pqM09BbVNmRWFJK2JsWkNRWlNoVE9SDQoxdVNaMS8xNmZNYVBBaGh3cG52eU5RYS9LblN4dlhsSUYrbVRDdz09PC9kczpTaWduYXR1cmVWYWx1ZT4=";
+            XmlDocument doc = new XmlDocument();
+            string xmlData = System.IO.File.ReadAllText(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + "//xades.xml");
+            doc.Load(new StringReader(xmlData));
+
+            string signatureValue = doc.GetElementsByTagName("ds:SignatureValue")[0].OuterXml.ToString();
+            var signatureBytes = System.Text.Encoding.UTF8.GetBytes(signatureValue);
+            string dataB64 = Convert.ToBase64String(signatureBytes);
+            
+            //String dataB64 = "PGRzOlNpZ25hdHVyZVZhbHVlIElkPSJzaWduYXR1cmVJZFNpZ25hdHVyZVZhbHVlIj5pU20zSE1lSlJUbHVkK0p5T0Vpc2cwc0RIK3pmbVFReElVQ3ducGgwUDh0ME1mY0NzdDN0WEw3UHhqdkFpc3dIYlpjc3dHMEtqZmpqDQpHc1NjaW9kMkdQSUdQOHVjR1AwbVc0RFdpQXVDNEZBcFZBUk1NWDRVWW93VCtBeVdrM1UweGN2N2w5UW1kRVNpY1hUbjcyV3dPTVpkDQoya3MydXg3SUttOTE3Y3dRN3kvVC9rZjQrVnBoNCtzU0phWkxyRGc1NkRaaWR0SGRtYVZ1dEIrdkJqa3pNRkJDaXl6ZDVWWlA3Q3lqDQpLSGpqTTZxT1NYNzJuQjJXd2V4aTVFZVJDZVRKSUJRSVBaWGVvb1FUQzJBWkdTeEtOMkFhZ1pqM09BbVNmRWFJK2JsWkNRWlNoVE9SDQoxdVNaMS8xNmZNYVBBaGh3cG52eU5RYS9LblN4dlhsSUYrbVRDdz09PC9kczpTaWduYXR1cmVWYWx1ZT4=";
 
             XmlDocument soapEnvelopeXml = CreateSoapEnvelope(dataB64);
             HttpWebRequest webRequest = CreateWebRequest();
@@ -224,6 +231,11 @@ namespace SIPVS.Controllers
 
             TimeStampResponse response = new TimeStampResponse(Convert.FromBase64String(timestampResultEncoded));
             //ViewBag.soapResult = response.ToString();
+
+            //var soapResultBytes = System.Text.Encoding.UTF8.GetBytes(soapResult);
+            //TimeStampParser.TSSoapClient ts = new TimeStampParser.TSSoapClient();
+            //string ret = ts.GetTimestamp(Convert.ToBase64String(soapResultBytes));
+
             ViewBag.soapResult = System.Text.Encoding.UTF8.GetString(response.GetEncoded());
             var token = response.TimeStampToken;
 
