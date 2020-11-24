@@ -231,13 +231,47 @@ namespace SIPVS.Controllers
 
             TimeStampResponse response = new TimeStampResponse(Convert.FromBase64String(timestampResultEncoded));
             //ViewBag.soapResult = response.ToString();
+            if (response.Status == 0)
+            {
+                //var token = System.Text.Encoding.UTF8.GetString(response.GetEncoded());
+                // xades="http://uri.etsi.org/01903/v1.3.2#"
+                XmlNamespaceManager nsmgr = new XmlNamespaceManager(doc.NameTable);
+                nsmgr.AddNamespace("xades", "http://uri.etsi.org/01903/v1.3.2#");
 
-            //var soapResultBytes = System.Text.Encoding.UTF8.GetBytes(soapResult);
-            //TimeStampParser.TSSoapClient ts = new TimeStampParser.TSSoapClient();
-            //string ret = ts.GetTimestamp(Convert.ToBase64String(soapResultBytes));
+                var token = System.Text.Encoding.UTF8.GetString(response.TimeStampToken.GetEncoded());
+                XmlNode QualifyingProperties = doc.SelectSingleNode("//xades:QualifyingProperties", nsmgr);
+                XmlNode SignedProperties = doc.SelectSingleNode("//xades:SignedProperties", nsmgr);
 
-            ViewBag.soapResult = System.Text.Encoding.UTF8.GetString(response.GetEncoded());
-            var token = response.TimeStampToken;
+                XmlNode UnsignedProperties = doc.CreateNode(XmlNodeType.Element, "xades", "UnsignedProperties", "http://uri.etsi.org/01903/v1.3.2#");
+                QualifyingProperties.InsertAfter(UnsignedProperties, SignedProperties);
+
+                XmlNode UnsignedSignatureProperties = doc.CreateNode(XmlNodeType.Element, "xades", "UnsignedSignatureProperties", "http://uri.etsi.org/01903/v1.3.2#");
+                UnsignedProperties.AppendChild(UnsignedSignatureProperties);
+
+                XmlNode SignatureTimeStamp = doc.CreateNode(XmlNodeType.Element, "xades",  "SignatureTimeStamp", "http://uri.etsi.org/01903/v1.3.2#");
+                UnsignedSignatureProperties.AppendChild(SignatureTimeStamp);
+
+                XmlNode EncapsulatedTimeStamp = doc.CreateNode(XmlNodeType.Element, "xades", "EncapsulatedTimeStamp", "http://uri.etsi.org/01903/v1.3.2#");
+                EncapsulatedTimeStamp.InnerText = token;
+               
+                SignatureTimeStamp.AppendChild(EncapsulatedTimeStamp);
+
+                System.IO.File.WriteAllText(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + "//xades-t.xml", doc.OuterXml.ToString());
+                ViewBag.soapResult = System.Text.Encoding.UTF8.GetString(response.GetEncoded());
+            }
+            else if (response.Status == 1)
+            {
+                ViewBag.soapResult = "niekto ti poškodil podpis";
+            }
+            else
+            {
+                ViewBag.soapResult = "nepodarilo sa podpisat";
+            }
+                
+
+
+            //ViewBag.soapResult = System.Text.Encoding.UTF8.GetString(response.GetEncoded());
+            //var token = response.TimeStampToken;
 
             return View();
         }
