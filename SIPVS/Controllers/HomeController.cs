@@ -190,16 +190,17 @@ namespace SIPVS.Controllers
 
         public ActionResult Timestamp()
         {
+            //nacitanie xadesu
             XmlDocument doc = new XmlDocument();
             string xmlData = System.IO.File.ReadAllText(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + "//xades.xml");
             doc.Load(new StringReader(xmlData));
 
+            //getnutie elementu SignatureValue a prevedenie do base64
             string signatureValue = doc.GetElementsByTagName("ds:SignatureValue")[0].OuterXml.ToString();
             var signatureBytes = System.Text.Encoding.UTF8.GetBytes(signatureValue);
             string dataB64 = Convert.ToBase64String(signatureBytes);
             
-            //String dataB64 = "PGRzOlNpZ25hdHVyZVZhbHVlIElkPSJzaWduYXR1cmVJZFNpZ25hdHVyZVZhbHVlIj5pU20zSE1lSlJUbHVkK0p5T0Vpc2cwc0RIK3pmbVFReElVQ3ducGgwUDh0ME1mY0NzdDN0WEw3UHhqdkFpc3dIYlpjc3dHMEtqZmpqDQpHc1NjaW9kMkdQSUdQOHVjR1AwbVc0RFdpQXVDNEZBcFZBUk1NWDRVWW93VCtBeVdrM1UweGN2N2w5UW1kRVNpY1hUbjcyV3dPTVpkDQoya3MydXg3SUttOTE3Y3dRN3kvVC9rZjQrVnBoNCtzU0phWkxyRGc1NkRaaWR0SGRtYVZ1dEIrdkJqa3pNRkJDaXl6ZDVWWlA3Q3lqDQpLSGpqTTZxT1NYNzJuQjJXd2V4aTVFZVJDZVRKSUJRSVBaWGVvb1FUQzJBWkdTeEtOMkFhZ1pqM09BbVNmRWFJK2JsWkNRWlNoVE9SDQoxdVNaMS8xNmZNYVBBaGh3cG52eU5RYS9LblN4dlhsSUYrbVRDdz09PC9kczpTaWduYXR1cmVWYWx1ZT4=";
-
+            
             XmlDocument soapEnvelopeXml = CreateSoapEnvelope(dataB64);
             HttpWebRequest webRequest = CreateWebRequest();
             InsertSoapEnvelopeIntoWebRequest(soapEnvelopeXml, webRequest);
@@ -230,15 +231,19 @@ namespace SIPVS.Controllers
             string timestampResultEncoded = xmlDoc.GetElementsByTagName("GetTimestampResult")[0].InnerText;
 
             TimeStampResponse response = new TimeStampResponse(Convert.FromBase64String(timestampResultEncoded));
-            //ViewBag.soapResult = response.ToString();
+
             if (response.Status == 0)
             {
-                //var token = System.Text.Encoding.UTF8.GetString(response.GetEncoded());
-                // xades="http://uri.etsi.org/01903/v1.3.2#"
+                //pridanie namespacu, vdaka ktorevu viem gettovat elementy s predponou xades
                 XmlNamespaceManager nsmgr = new XmlNamespaceManager(doc.NameTable);
                 nsmgr.AddNamespace("xades", "http://uri.etsi.org/01903/v1.3.2#");
 
+                //prevedenie tokenu do Base64
                 var token = System.Text.Encoding.UTF8.GetString(response.TimeStampToken.GetEncoded());
+                var tokenBytes = System.Text.Encoding.UTF8.GetBytes(token);
+                string tokenB64 = Convert.ToBase64String(tokenBytes);
+
+                //pridanie struktury nodeov do xadesu
                 XmlNode QualifyingProperties = doc.SelectSingleNode("//xades:QualifyingProperties", nsmgr);
                 XmlNode SignedProperties = doc.SelectSingleNode("//xades:SignedProperties", nsmgr);
 
@@ -251,27 +256,27 @@ namespace SIPVS.Controllers
                 XmlNode SignatureTimeStamp = doc.CreateNode(XmlNodeType.Element, "xades",  "SignatureTimeStamp", "http://uri.etsi.org/01903/v1.3.2#");
                 UnsignedSignatureProperties.AppendChild(SignatureTimeStamp);
 
+                //pridanie id a tokenu do elementu EncapsulatedTimeStamp
                 XmlNode EncapsulatedTimeStamp = doc.CreateNode(XmlNodeType.Element, "xades", "EncapsulatedTimeStamp", "http://uri.etsi.org/01903/v1.3.2#");
-                EncapsulatedTimeStamp.InnerText = token;
-               
+                EncapsulatedTimeStamp.InnerText = tokenB64;
+                var idAttr = doc.CreateAttribute("id");
+                idAttr.Value = "TimeStampID";
+                EncapsulatedTimeStamp.Attributes.Append(idAttr);
+
                 SignatureTimeStamp.AppendChild(EncapsulatedTimeStamp);
 
                 System.IO.File.WriteAllText(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + "//xades-t.xml", doc.OuterXml.ToString());
-                ViewBag.soapResult = System.Text.Encoding.UTF8.GetString(response.GetEncoded());
+                ViewBag.soapResult = doc.OuterXml.ToString();
             }
             else if (response.Status == 1)
             {
+                // ak nam responce vrati status 1 tak bol podpi poskodeny
                 ViewBag.soapResult = "niekto ti poškodil podpis";
             }
             else
             {
                 ViewBag.soapResult = "nepodarilo sa podpisat";
             }
-                
-
-
-            //ViewBag.soapResult = System.Text.Encoding.UTF8.GetString(response.GetEncoded());
-            //var token = response.TimeStampToken;
 
             return View();
         }
