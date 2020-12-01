@@ -239,9 +239,7 @@ namespace SIPVS.Controllers
                 nsmgr.AddNamespace("xades", "http://uri.etsi.org/01903/v1.3.2#");
 
                 //prevedenie tokenu do Base64
-                var token = System.Text.Encoding.UTF8.GetString(response.TimeStampToken.GetEncoded());
-                var tokenBytes = System.Text.Encoding.UTF8.GetBytes(token);
-                string tokenB64 = Convert.ToBase64String(tokenBytes);
+                string tokenB64 = Convert.ToBase64String(response.TimeStampToken.GetEncoded());
 
                 //pridanie struktury nodeov do xadesu
                 XmlNode QualifyingProperties = doc.SelectSingleNode("//xades:QualifyingProperties", nsmgr);
@@ -266,7 +264,7 @@ namespace SIPVS.Controllers
                 SignatureTimeStamp.AppendChild(EncapsulatedTimeStamp);
 
                 System.IO.File.WriteAllText(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + "//xades-t.xml", doc.OuterXml.ToString());
-                ViewBag.soapResult = doc.OuterXml.ToString();
+                ViewBag.soapResult = "Bola vygenerovaná časová pečiatka do súboru /Documents/xades-t.xml";
             }
             else if (response.Status == 1)
             {
