@@ -163,6 +163,36 @@ namespace SIPVS.Controllers
             return View();
         }
 
+        
+        public ActionResult XadesT()
+        {
+
+            return View();
+        }
+
+        [HttpPost, ValidateInput(false)]
+        public ActionResult XadesResult(String input)
+        {
+            //Overenie datovej obalky
+            if (!input.Contains("xmlns:xzep='http://www.ditec.sk/ep/signature_formats/xades_zep/v2.0'") || !input.Contains("xmlns:ds"))
+            {
+                ViewBag.xadesResult = "Overenie datovej obalky zlyhalo.";
+                return RedirectToAction("XadesT", "Home");
+            }
+
+            byte[] data = System.Text.Encoding.UTF8.GetBytes(input);
+
+            //Overenie XML Signature
+
+            //Overenie casovej peciatky
+
+            //Overenie platnosti podpisovaneho certifikatu
+
+
+            ViewBag.xadesResult = "Subor nacitany";
+            return RedirectToAction("XadesT", "Home");
+        }
+
         public ActionResult Application()
         {
             /*

@@ -1,0 +1,56 @@
+﻿
+@{
+    ViewBag.Title = "XadesT";
+}
+
+<h2>Overenie XADES-T podpisu</h2>
+
+<p>Vyberte podpísaný súbor, ktorý chcete overiť:</p>
+<input type="file" id="input" />
+<br/>
+
+<button id="signButton" class="btn btn-default" type="button" name="action" value="sign">Overiť</button>
+
+<div style="font-family: Times New Roman;">
+    @if (ViewBag.xadesResult != null)
+    {
+        @Html.Raw(ViewBag.xadesResult)
+    }
+</div>
+
+
+
+<script>
+
+    $("#signButton").click(function () {
+        function Callback(onSuccess) {
+            console.log(onSuccess);
+            this.onSuccess = onSuccess;
+            this.onError = function (e) {
+                alert("Chyba: " + e);
+            }
+        }
+
+        console.log('OMG');
+        var _xml = document.getElementById('input').files[0];
+
+
+        if (_xml) {
+            var reader_xml = new FileReader();
+            reader_xml.readAsText(_xml, "UTF-8");
+            reader_xml.onload = function (evt) {
+                var xml_content = evt.target.result;
+                $.post('@Url.Action("XadesResult", "Home")', { input: xml_content });
+            }
+            reader_xml.onerror = function (evt) {
+                document.getElementById("fileContents").innerHTML = "Error reading XML file";
+            }
+        }
+    });
+</script>
+
+<script type="text/javascript" src="https://www.slovensko.sk/static/zep/dbridge_js/v1.0/config.js"></script>
+<script type="text/javascript" src="https://www.slovensko.sk/static/zep/dbridge_js/v1.0/dCommon.min.js"></script>
+<script type="text/javascript" src="https://www.slovensko.sk/static/zep/dbridge_js/v1.0/dSigXades.min.js"></script>
+
+
