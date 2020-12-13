@@ -1,0 +1,11 @@
+﻿@{
+    ViewBag.Title = "Result";
+}
+
+<h2>Výsledok overenia</h2>
+<div style="font-family: Times New Roman;">
+    @if (ViewBag.xadesResult != null)
+    {
+        @Html.Raw(ViewBag.xadesResult)
+    }
+</div>

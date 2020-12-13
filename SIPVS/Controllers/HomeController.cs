@@ -12,8 +12,20 @@ using System.Xml.Linq;
 using System.Xml.Xsl;
 using System.IO;
 using System.Net;
+using System.Xml.XPath;
 using System.Xml.Serialization;
+using System.Security;
+using System.Security.Cryptography.Xml;
 using Org.BouncyCastle.Tsp;
+using System.Security.Cryptography;
+using Org.BouncyCastle.X509;
+using Org.BouncyCastle.Asn1;
+using Org.BouncyCastle.Crypto.Tls;
+using Org.BouncyCastle.Asn1.X509;
+using HashAlgorithm = System.Security.Cryptography.HashAlgorithm;
+using Org.BouncyCastle.Crypto;
+using Org.BouncyCastle.Security;
+using Org.BouncyCastle.Utilities.Encoders;
 
 namespace SIPVS.Controllers
 {
@@ -166,6 +178,16 @@ namespace SIPVS.Controllers
         
         public ActionResult XadesT()
         {
+            
+            return View();
+        }
+
+        public ActionResult Result()
+        {
+            if (TempData["xadesResult"] != null)
+            {
+                ViewBag.xadesResult = TempData["xadesResult"];
+            }
 
             return View();
         }
@@ -173,24 +195,485 @@ namespace SIPVS.Controllers
         [HttpPost, ValidateInput(false)]
         public ActionResult XadesResult(String input)
         {
-            //Overenie datovej obalky
-            if (!input.Contains("xmlns:xzep='http://www.ditec.sk/ep/signature_formats/xades_zep/v2.0'") || !input.Contains("xmlns:ds"))
+            //schemas.Add("http://www.ditec.sk/ep/signature_formats/xades_zep/v2.0", Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + "//xades_zep.v2.0.xsd");
+
+            try
             {
-                ViewBag.xadesResult = "Overenie datovej obalky zlyhalo.";
-                return RedirectToAction("XadesT", "Home");
+                //XDocument doc = XDocument.Load(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + "//01XadesT.xml");
+                XDocument doc = XDocument.Parse(input);
+
+                // Overenie datovej obalky
+                if (doc.Root.Attribute(XNamespace.Xmlns + "xzep").Value.Equals("http://www.ditec.sk/ep/signature_formats/xades_zep/v1.0") == false)
+                {
+                    throw new Exception("Atribút xmlns:xzep koreňového elementu neobsahuje hodnotu http://www.ditec.sk/ep/signature_formats/xades_zep/v1.0");
+                }
+                else if (doc.Root.Attribute(XNamespace.Xmlns + "ds").Value.Equals("http://www.w3.org/2000/09/xmldsig#") == false)
+                {
+                    throw new Exception("Atribút xmlns:ds koreňového elementu neobsahuje hodnotu http://www.w3.org/2000/09/xmldsig#");
+                }
+
+                //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+                // Overenie XML Signature
+
+                // Kontrola obsahu ds:SignatureMethod
+
+                XmlReader reader = XmlReader.Create(new StringReader(input));
+                XElement root = XElement.Load(reader);
+                XmlDocument xmlDoc = new XmlDocument();
+                xmlDoc.LoadXml(input);
+                XmlNameTable nameTable = reader.NameTable;
+                XmlNamespaceManager namespaceManager = new XmlNamespaceManager(nameTable);
+
+                namespaceManager.AddNamespace("ds", "http://www.w3.org/2000/09/xmldsig#");
+                namespaceManager.AddNamespace("xzep", "http://www.ditec.sk/ep/signature_formats/xades_zep/v1.0");
+
+                XElement sigMethod = root.XPathSelectElement("//ds:Signature/ds:SignedInfo/ds:SignatureMethod", namespaceManager);
+
+                if (sigMethod == null)
+                {
+                    throw new Exception("Chyba pri kontrole elementu ds:Signature/ds:SignedInfo/ds:SignatureMethod. Element nebol v dokumente nájdený");
+                }
+
+                string[] sigMethods = { "http://www.w3.org/2000/09/xmldsig#dsa-sha1",
+                                        "http://www.w3.org/2000/09/xmldsig#rsa-sha1",
+                                        "http://www.w3.org/2001/04/xmldsig-more#rsa-sha256",
+                                        "http://www.w3.org/2001/04/xmldsig-more#rsa-sha384",
+                                        "http://www.w3.org/2001/04/xmldsig-more#rsa-sha512"};
+
+                if (Array.Exists(sigMethods, element => element == sigMethod.Attribute("Algorithm").Value) == false)
+                {
+                    throw new Exception("Atribút Algorithm elementu ds:SignatureMethod neobsahuje URI niektorého z podporovaných algoritmov.");
+                }
+
+                //--------------------------------------------------------------------------------------------------------------------
+
+                // Kontrola obsahu ds:CanonicalizationMethod
+
+                XElement canonMethod = root.XPathSelectElement("//ds:Signature/ds:SignedInfo/ds:CanonicalizationMethod", namespaceManager);
+
+                if (canonMethod == null)
+                {
+                    throw new Exception("Chyba pri kontrole elementu ds:Signature/ds:SignedInfo/ds:CanonicalizationMethod. Element nebol v dokumente nájdený.");
+                }
+
+                string[] canonMethods = { "http://www.w3.org/TR/2001/REC-xml-c14n-20010315"};
+
+                if (Array.Exists(canonMethods, element => element == canonMethod.Attribute("Algorithm").Value) == false)
+                {
+                    throw new Exception("Atribút Algorithm elementu ds:CanonicalizationMethod neobsahuje URI niektorého z podporovaných algoritmov");
+                }
+
+                //--------------------------------------------------------------------------------------------------------------------
+
+                // Kontrola obsahu ds:Transforms vo vs. referenciach v ds:SignedInfo
+
+                IEnumerable<XElement> transformsElems = root.XPathSelectElements("//ds:Signature/ds:SignedInfo/ds:Reference/ds:Transforms", namespaceManager);
+
+                if (transformsElems == null)
+                {
+                    throw new Exception("Chyba pri kontrole elementu ds:Signature/ds:SignedInfo/ds:Reference/ds:Transforms. Element nebol v dokumente nájdený.");
+                }
+
+                string[] transformMethods = { "http://www.w3.org/TR/2001/REC-xml-c14n-20010315" };
+
+                foreach (XElement el in transformsElems)
+                {
+                    XmlElement elem = (XmlElement)xmlDoc.ReadNode(el.CreateReader());
+                    XmlElement transformElement = (XmlElement) elem.GetElementsByTagName("ds:Transform").Item(0);
+
+                    // Kontrola obsahu ds:Transforms. Musi obsahovať URI niektorého z podporovaných algoritmov
+
+                    if (Array.Exists(transformMethods, element => element == transformElement.GetAttribute("Algorithm")) == false)
+                    {
+                        throw new Exception("Atribút Algorithm elementu ds:Transforms neobsahuje URI niektorého z podporovaných algoritmov");
+                    }
+                }
+
+                //--------------------------------------------------------------------------------------------------------------------
+
+                // Kontrola obsahu ds:DigestMethod vo vs. referenciach v ds:SignedInfo
+
+                IEnumerable<XElement> digestElems = root.XPathSelectElements("//ds:Signature/ds:SignedInfo/ds:Reference/ds:DigestMethod", namespaceManager);
+
+                if (digestElems == null)
+                {
+                    throw new Exception("Chyba pri kontrole elementu ds:Signature/ds:SignedInfo/ds:Reference/ds:DigestMethod. Element nebol v dokumente nájdený.");
+                }
+
+                string[] digestMethods = {  "http://www.w3.org/2000/09/xmldsig#sha1",
+                                            "http://www.w3.org/2001/04/xmldsig-more#sha224",
+                                            "http://www.w3.org/2001/04/xmlenc#sha256",
+                                            "http://www.w3.org/2001/04/xmldsig-more#sha384",
+                                            "http://www.w3.org/2001/04/xmlenc#sha512"};
+
+                foreach (XElement el in digestElems)
+                {
+                    //System.Diagnostics.Debug.WriteLine(el.Attribute("Algorithm").Value);
+
+                    if (Array.Exists(digestMethods, element => element == el.Attribute("Algorithm").Value) == false)
+                    {
+                        throw new Exception("Atribút Algorithm elementu ds:DigestMethod neobsahuje URI niektorého z podporovaných algoritmov");
+                    }
+                }
+
+                //--------------------------------------------------------------------------------------------------------------------
+
+                /*
+                 * Core validation (podľa špecifikácie XML Signature)
+                 * Dereferencovanie URI, kanonikalizácia referencovaných ds:Manifest elementov
+                 * a overenie hodnôt odtlačkov ds:DigestValue
+                 */
+
+                Dictionary<string, string> digestAlgo = new Dictionary<string, string>() {
+                    { "http://www.w3.org/2000/09/xmldsig#sha1", "SHA-1" },
+                    { "http://www.w3.org/2001/04/xmldsig-more#sha224", "SHA-224" },
+                    { "http://www.w3.org/2001/04/xmlenc#sha256", "SHA-256" },
+                    { "http://www.w3.org/2001/04/xmldsig-more#sha384", "SHA-384" },
+                    { "http://www.w3.org/2001/04/xmlenc#sha512", "SHA-512" } 
+                };
+
+                IEnumerable<XElement> refElems = root.XPathSelectElements("//ds:Signature/ds:SignedInfo/ds:Reference", namespaceManager);
+
+                if (refElems == null)
+                {
+                    throw new Exception("Chyba pri ziskavani elementu ds:Signature/ds:SignedInfo/ds:Reference. Element nebol v dokumente nájdený.");
+                }
+
+                foreach (XElement el in refElems)
+                {
+                    XmlElement refElement = (XmlElement)xmlDoc.ReadNode(el.CreateReader());
+                    string uri = refElement.GetAttribute("URI").Substring(1);
+
+                    XmlElement manifestElement = findByAttributeValue("ds:Manifest", "Id", uri, xmlDoc);
+                    //System.Diagnostics.Debug.WriteLine(manifestElement);
+
+                    if (manifestElement == null)
+                    {
+                        continue;
+                    }
+
+                    XmlElement digestValueElement = (XmlElement)refElement.GetElementsByTagName("ds:DigestValue").Item(0);
+                    string expectedDigestValue = digestValueElement.InnerText;//getTextContent()
+                    XmlElement digestMethodElement = (XmlElement)refElement.GetElementsByTagName("ds:DigestMethod").Item(0);
+
+                    if (Array.Exists(digestMethods, element => element == digestMethodElement.GetAttribute("Algorithm")) == false)
+                    {
+
+                        throw new Exception("Atribút Algorithm elementu ds:DigestMethod (" + digestMethodElement.GetAttribute("Algorithm") +") neobsahuje URI niektorého z podporovaných algoritmov");
+                    }
+
+                    string digestMethod = digestMethodElement.GetAttribute("Algorithm");
+
+                    //System.Diagnostics.Debug.WriteLine(digestMethod);
+                    digestMethod = digestAlgo[digestMethod];
+                    //System.Diagnostics.Debug.WriteLine(digestMethod);
+
+                    byte[] manifestElementBytes = null;
+
+                    try
+                    {
+                        manifestElementBytes = System.Text.Encoding.Default.GetBytes(manifestElement.OuterXml);
+
+                    }
+                    catch (Exception e)
+                    {
+
+                        throw new Exception("Core validacia zlyhala. Chyba pri tranformacii z Element do String", e);
+                    }
+
+                    XmlNodeList transformsElements = manifestElement.GetElementsByTagName("ds:Transforms");
+
+                    foreach (XmlElement transformsElement in transformsElements)
+                    {
+                        XmlElement transformElement = (XmlElement) transformsElement.GetElementsByTagName("ds:Transform").Item(0);
+                        string transformMethod = transformElement.GetAttribute("Algorithm");
+
+                        if (transformMethod.Equals("http://www.w3.org/TR/2001/REC-xml-c14n-20010315"))
+                        {
+                            try
+                            {
+                                XmlDsigC14NTransform xmlTransform = new XmlDsigC14NTransform();
+                                xmlTransform.LoadInput(new MemoryStream(manifestElementBytes));
+                                MemoryStream stream = (MemoryStream) xmlTransform.GetOutput();
+                                manifestElementBytes = stream.ToArray();
+                            }
+                            catch (Exception e)
+                            {
+
+                                throw new Exception("Core validation zlyhala. Chyba pri kanonikalizacii", e);
+                            }
+                        }
+                    }
+
+                    HashAlgorithm hashAlgo = null;
+                    switch (digestMethod)
+                    {
+                        case "SHA-1":
+                            hashAlgo = SHA1.Create();
+                            break;
+                        case "SHA-256":
+                            hashAlgo = SHA256.Create();
+                            break;
+                        case "SHA-384":
+                            hashAlgo = SHA384.Create();
+                            break;
+                        case "SHA-512":
+                            hashAlgo = SHA512.Create();
+                            break;
+                        default:
+                            throw new Exception("Core validation zlyhala, neznamy algoritmus " + digestMethod);
+                    }
+                    string actualDigestValue = Convert.ToBase64String(hashAlgo.ComputeHash(manifestElementBytes));
+
+                    if (expectedDigestValue.Equals(actualDigestValue) == false)
+                    {
+                        throw new Exception("Core validation zlyhala. Hodnota ds:DigestValue elementu ds:Reference sa nezhoduje s hash hodnotou elementu ds:Manifest");
+                    }
+                }
+
+                //--------------------------------------------------------------------------------------------------------------------
+
+                /*
+                 * Element ds:Signature:
+                 * 	- musí mať Id atribút,
+                 * 	- musí mať špecifikovaný namespace xmlns:ds
+                 */
+
+                 XmlElement signatureElement = (XmlElement) xmlDoc.GetElementsByTagName("ds:Signature").Item(0);
+
+                 if (signatureElement == null)
+                 {
+                    
+                    throw new Exception("Element ds:Signature sa nenašiel");
+                 }
+
+                 if (signatureElement.HasAttribute("Id") == false)
+                 {
+
+                    throw new Exception("Element ds:Signature neobsahuje atribút Id");
+                 }
+
+                 if (signatureElement.GetAttribute("Id") == "" || signatureElement.GetAttribute("Id") == null)
+                 {
+
+                    throw new Exception("Atribút Id elementu ds:Signature neobsahuje žiadnu hodnotu");
+                 }
+
+                 if (signatureElement.GetAttribute("xmlns:ds").Equals("http://www.w3.org/2000/09/xmldsig#") == false)
+                 {
+
+                    throw new Exception("Element ds:Signature nemá nastavený namespace xmlns:ds");
+                 }
+
+                //--------------------------------------------------------------------------------------------------------------------
+
+                /*
+                 * Element ds:SignatureValue
+                 * 	– musí mať Id atribút
+                 */
+
+                 XmlElement signatureValueElement = (XmlElement) xmlDoc.GetElementsByTagName("ds:SignatureValue").Item(0);
+
+                 if (signatureValueElement == null)
+                 {
+
+                    throw new Exception("Element ds:SignatureValue sa nenašiel");
+                 }
+
+                 if (signatureValueElement.HasAttribute("Id") == false)
+                 {
+
+                    throw new Exception("Element ds:SignatureValue neobsahuje atribút Id");
+                 }
+
+                //--------------------------------------------------------------------------------------------------------------------
+
+                /*
+                 * Core validation (podľa špecifikácie XML Signature)
+                 * Kanonikalizácia ds:SignedInfo a overenie hodnoty ds:SignatureValue
+                 * pomocou pripojeného podpisového certifikátu v ds:KeyInfo
+                 */
+
+                signatureElement = (XmlElement) xmlDoc.GetElementsByTagName("ds:Signature").Item(0);
+
+                XmlElement signedInfoElement = (XmlElement) signatureElement.GetElementsByTagName("ds:SignedInfo").Item(0);
+                XmlElement canonicalizationMethodElement = (XmlElement) signedInfoElement.GetElementsByTagName("ds:CanonicalizationMethod").Item(0);
+
+                Dictionary<string, string> signAlgo = new Dictionary<string, string>() {
+                    { "http://www.w3.org/2000/09/xmldsig#dsa-sha1", "SHA1withDSA" },
+                    { "http://www.w3.org/2000/09/xmldsig#rsa-sha1", "SHA1withRSA/ISO9796-2" },
+                    { "http://www.w3.org/2001/04/xmldsig-more#rsa-sha256", "SHA256withRSA" },
+                    { "http://www.w3.org/2001/04/xmldsig-more#rsa-sha384", "SHA384withRSA" },
+                    { "http://www.w3.org/2001/04/xmldsig-more#rsa-sha512", "SHA512withRSA" }
+                };
+
+                XmlElement signatureMethodElement = (XmlElement) signedInfoElement.GetElementsByTagName("ds:SignatureMethod").Item(0);
+                signatureValueElement = (XmlElement) signatureElement.GetElementsByTagName("ds:SignatureValue").Item(0);
+
+                byte[] signedInfoElementBytes = null;
+                try
+                {
+                    signedInfoElementBytes = System.Text.Encoding.UTF8.GetBytes(signedInfoElement.OuterXml);
+                }
+                catch (Exception e)
+                {
+
+                    throw new Exception("Core validation zlyhala. Chyba pri tranformacii z Element do String", e);
+                }
+
+                string canonicalizationMethod = canonicalizationMethodElement.GetAttribute("Algorithm");
+
+                if (canonicalizationMethod.Equals("http://www.w3.org/TR/2001/REC-xml-c14n-20010315"))
+                {
+                    try
+                    {
+                        XmlDsigC14NTransform xmlTransform = new XmlDsigC14NTransform();
+                        xmlTransform.LoadInput(new MemoryStream(signedInfoElementBytes));
+                        MemoryStream stream = (MemoryStream)xmlTransform.GetOutput();
+                        signedInfoElementBytes = stream.ToArray();
+                    }
+                    catch (Exception e)
+                    {
+
+                        throw new Exception("Core validation zlyhala. Chyba pri kanonikalizacii", e);
+                    }
+                }
+
+                X509Certificate certificate = null;
+
+                try
+                {
+                    certificate = getCertificate(xmlDoc);
+
+                }
+                catch (Exception e)
+                {
+
+                    throw new Exception("X509 certifikát sa v dokumente nepodarilo nájsť", e);
+                }
+
+                string signatureMethod = signatureMethodElement.GetAttribute("Algorithm");
+                signatureMethod = signAlgo[signatureMethod];
+                ISigner signer = null;
+
+                try
+                {
+                    signer = SignerUtilities.GetSigner(signatureMethod);
+                    signer.Init(false, certificate.GetPublicKey());
+                    signer.BlockUpdate(signedInfoElementBytes, 0, signedInfoElementBytes.Length);
+
+                }
+                catch (Exception e) {
+
+                    throw new Exception("Core validation zlyhala. Chyba pri inicializacii prace s digitalnym podpisom", e);
+                }
+
+                byte[] signatureValueBytes = System.Text.Encoding.UTF8.GetBytes(signatureValueElement.OuterXml);
+
+                bool verificationResult = false;
+
+                try
+                {
+                    verificationResult = signer.VerifySignature(signatureValueBytes);
+
+                }
+                catch (SignatureException e)
+                {
+
+                    throw new Exception("Core validation zlyhala. Chyba pri verifikacii digitalneho podpisu", e);
+                }
+
+                if (verificationResult == false)
+                {
+
+                    throw new Exception("Podpisana hodnota ds:SignedInfo sa nezhoduje s hodnotou v elemente ds:SignatureValue");
+                }
+
+
+                TempData["xadesResult"] = "XML subor validny!";
+                return RedirectToActionPermanent("Result");
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine(ex.Message);
+                TempData["xadesResult"] = "Datova obalka chybna!" + ex.Message;
+                return RedirectToActionPermanent("Result");
             }
 
             byte[] data = System.Text.Encoding.UTF8.GetBytes(input);
 
-            //Overenie XML Signature
+            XmlElement findByAttributeValue(string elType, string attributeName, string attributeValue, XmlDocument xmlDoc)
+            {
+
+                XmlNodeList elements = xmlDoc.GetElementsByTagName(elType);
+
+                for (int i = 0; i < elements.Count; i++)
+                {
+
+                    XmlElement element = (XmlElement)elements.Item(i);
+
+                    if (element.HasAttribute(attributeName) && element.GetAttribute(attributeName).Equals(attributeValue))
+                    {
+                        return element;
+                    }
+                }
+
+                return null;
+            }
+
+            X509Certificate getCertificate(XmlDocument xmlDoc) {
+
+                XmlElement keyInfoElement = (XmlElement)xmlDoc.GetElementsByTagName("ds:KeyInfo").Item(0);
+
+                if (keyInfoElement == null)
+                {
+                    throw new Exception("Chyba pri ziskavani certifikatu: Dokument neobsahuje element ds:KeyInfo");
+                }
+
+                XmlElement x509DataElement = (XmlElement)keyInfoElement.GetElementsByTagName("ds:X509Data").Item(0);
+
+                if (x509DataElement == null)
+                {
+                    throw new Exception("Chyba pri ziskavani certifikatu: Dokument neobsahuje element ds:X509Data");
+                }
+
+                XmlElement x509Certificate = (XmlElement)x509DataElement.GetElementsByTagName("ds:X509Certificate").Item(0);
+
+                if (x509Certificate == null)
+                {
+                    throw new Exception("Chyba pri ziskavani certifikatu: Dokument neobsahuje element ds:X509Certificate");
+                }
+
+                X509Certificate certObject = null;
+                Asn1InputStream inputStream = null;
+
+                try
+                {
+                    inputStream = new Asn1InputStream(new MemoryStream(Convert.FromBase64String(x509Certificate.InnerText)));
+                    Asn1Sequence sequence = (Asn1Sequence)inputStream.ReadObject();
+                    certObject = new X509Certificate(X509CertificateStructure.GetInstance(sequence));
+
+                }
+                catch (Exception e) {
+
+                    throw new Exception("Certifikát nebolo možné načítať", e);
+
+                }
+                finally
+                {
+                    if (inputStream != null)
+                    {
+                        inputStream.Close();
+                    }
+                }
+
+                return certObject;
+            }
 
             //Overenie casovej peciatky
 
             //Overenie platnosti podpisovaneho certifikatu
-
-
-            ViewBag.xadesResult = "Subor nacitany";
-            return RedirectToAction("XadesT", "Home");
         }
 
         public ActionResult Application()
@@ -345,6 +828,19 @@ namespace SIPVS.Controllers
             using (Stream stream = webRequest.GetRequestStream())
             {
                 soapEnvelopeXml.Save(stream);
+            }
+        }
+
+        private static void ValidationEventHandler(object sender, ValidationEventArgs e)
+        {
+            switch (e.Severity)
+            {
+                case XmlSeverityType.Error:
+                    Console.WriteLine("Error: {0}", e.Message);
+                    break;
+                case XmlSeverityType.Warning:
+                    Console.WriteLine("Warning {0}", e.Message);
+                    break;
             }
         }
     }

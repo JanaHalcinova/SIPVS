@@ -53,6 +53,7 @@
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
+    <Reference Include="System.Security" />
     <Reference Include="System.Web.DynamicData" />
     <Reference Include="System.Web.Entity" />
     <Reference Include="System.Web.ApplicationServices" />
@@ -203,7 +204,7 @@
     <Content Include="Views\Home\SignXml.cshtml" />
     <Content Include="Views\Home\Timestamp.cshtml" />
     <Content Include="Views\Home\XadesT.cshtml" />
-    <Content Include="Views\Home\XadesResult.cshtml" />
+    <Content Include="Views\Home\Result.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

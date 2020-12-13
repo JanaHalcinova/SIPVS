@@ -7,17 +7,10 @@
 
 <p>Vyberte podpísaný súbor, ktorý chcete overiť:</p>
 <input type="file" id="input" />
-<br/>
+<br />
 
 <button id="signButton" class="btn btn-default" type="button" name="action" value="sign">Overiť</button>
-
-<div style="font-family: Times New Roman;">
-    @if (ViewBag.xadesResult != null)
-    {
-        @Html.Raw(ViewBag.xadesResult)
-    }
-</div>
-
+<button id="signButton" class="btn btn-default" type="button" name="action" onclick="location.href='@Url.Action("Result", "Home")'" target="_blank">Zobraziť výsledok</button>
 
 
 <script>
@@ -31,7 +24,6 @@
             }
         }
 
-        console.log('OMG');
         var _xml = document.getElementById('input').files[0];
 
 
