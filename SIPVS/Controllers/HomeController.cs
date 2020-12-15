@@ -37,6 +37,7 @@ using Org.BouncyCastle.Asn1.Nist;
 using System.Text;
 using Org.BouncyCastle.Crypto.Digests;
 using Org.BouncyCastle.Security.Certificates;
+using System.Text.RegularExpressions;
 
 namespace SIPVS.Controllers
 {
@@ -204,9 +205,12 @@ namespace SIPVS.Controllers
         }
 
         [HttpPost, ValidateInput(false)]
-        public ActionResult XadesResult(String input)
+        public ActionResult XadesResult(String input, String name)
         {
+            System.Diagnostics.Debug.WriteLine(name);
             //schemas.Add("http://www.ditec.sk/ep/signature_formats/xades_zep/v2.0", Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + "//xades_zep.v2.0.xsd");
+            bool coreValid = selectValidationCore(name);
+            bool manifestValid = selectValidationManifest(name);
 
             try
             {
@@ -964,7 +968,6 @@ namespace SIPVS.Controllers
                         certifikat.SerialNumber.Equals(ts_token.SignerID.SerialNumber))
                     {
                         signerCert = certifikat;
-                        //System.Diagnostics.Debug.WriteLine(certifikat.SerialNumber);
                         break;
                     }
                 }
@@ -989,6 +992,7 @@ namespace SIPVS.Controllers
                  */
 
                 byte[] messageImprint = ts_token.TimeStampInfo.GetMessageImprintDigest();
+                //System.Diagnostics.Debug.WriteLine(Convert.ToBase64String(messageImprint));
                 String hashAlg = ts_token.TimeStampInfo.HashAlgorithm.Algorithm.Id;
 
                 XElement signatureValueNode = null;
@@ -1000,10 +1004,8 @@ namespace SIPVS.Controllers
                     throw new Exception("Element ds:SignatureValue nenájdený.");
                 }
 
-                XmlElement sigValueNode = (XmlElement)xmlDoc.ReadNode(signatureValueNode.CreateReader());
-
-                byte[] signatureValue = Encoding.UTF8.GetBytes(sigValueNode.InnerText);
-
+                //XmlElement sigValueNode = (XmlElement)xmlDoc.ReadNode(signatureValueNode.CreateReader());
+                byte[] signatureValue = Encoding.Default.GetBytes(signatureValueNode.Value);//.Replace(System.Environment.NewLine, "")
 
                 Dictionary<string, string> algorithms = new Dictionary<string, string>() {
                     { OiwObjectIdentifiers.IdSha1.Id, "SHA-1"},
@@ -1021,7 +1023,7 @@ namespace SIPVS.Controllers
                         hashTAlgo = SHA1.Create();
                         break;
                     case "SHA-256":
-                        hashTAlgo = SHA256.Create();
+                        hashTAlgo = HashAlgorithm.Create("SHA-256");
                         break;
                     case "SHA-384":
                         hashTAlgo = SHA384.Create();
@@ -1033,77 +1035,11 @@ namespace SIPVS.Controllers
                         throw new Exception("Core validation zlyhala, neznamy algoritmus " + digMethod);
                 }
 
-                byte[] comparisonVal = hashTAlgo.ComputeHash(signatureValue, 0, signatureValue.Length);
+                byte[] comparisonVal = hashTAlgo.ComputeHash(signatureValue);
 
                 if (messageImprint.Equals(comparisonVal)){
 			        throw new Exception("MessageImprint z časovej pečiatky a podpis ds:SignatureValue sa nezhodujú.");
 		        }
-
-
-                //--------------------------------------------------------------------------------------------------------------------
-
-                /*
-                 * Overenie platnosti podpisového certifikátu dokumentu voči času T z časovej pečiatky
-                 * a voči platnému poslednému CRL
-                 */
-
-                X509Crl crl2 = crlParser.ReadCrl(System.IO.File.ReadAllBytes(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + "//DTCCACrl.crl"));
-
-                XElement certificateNode = null;
-
-                certificateNode = root.XPathSelectElement("//ds:Signature/ds:KeyInfo/ds:X509Data/ds:X509Certificate", namespaceManager);
-
-                if (certificateNode == null)
-                {
-                    throw new Exception("Element ds:X509Certificate nenájdený.");
-                }
-
-                X509Certificate signCert = null;
-                Asn1InputStream asn1is = null;
-
-                try
-                {
-                    asn1is = new Asn1InputStream(new MemoryStream(Encoding.UTF8.GetBytes(certificateNode.Value)));
-                    System.Diagnostics.Debug.WriteLine(certificateNode.Value);
-                    Asn1Sequence sq = (Asn1Sequence) Asn1Object.FromStream(asn1is).ToAsn1Object();//asn1is.ReadObject()
-                    System.Diagnostics.Debug.WriteLine("WTFFF");
-                    signCert = new X509Certificate(X509CertificateStructure.GetInstance(sq));
-                }
-                catch (Exception e) {
-                    throw new Exception("OJOJ" + e);
-                } finally
-                {
-                    if (asn1is != null)
-                    {
-                        try
-                        {
-                            asn1is.Close();
-                        }
-                        catch (Exception e)
-                        {
-                            throw new Exception("Nie je možné prečítať certifikát dokumentu.");
-                        }
-                    }
-                }
-
-                try
-                {
-                    signCert.CheckValidity(ts_token.TimeStampInfo.GenTime);
-                }
-                catch (CertificateExpiredException e)
-                {
-                    throw new CertificateExpiredException("Certifikát dokumentu bol pri podpise expirovaný.");
-                }
-                catch (CertificateNotYetValidException e)
-                {
-                    throw new CertificateNotYetValidException("Certifikát dokumentu ešte nebol platný v čase podpisovania.");
-                }
-
-                X509CrlEntry entry = crl.GetRevokedCertificate(signCert.SerialNumber);
-                if (entry != null && entry.RevocationDate < (ts_token.TimeStampInfo.GenTime))
-                {
-                    throw new Exception("Certifikát bol zrušený v čase podpisovania.");
-                }
 
                 //--------------------------------------------------------------------------------------------------------------------
 
@@ -1117,7 +1053,7 @@ namespace SIPVS.Controllers
 
                 if (manRefElements == null)
                 {
-                    throw new Exception("Chyba pri hladanii ds:Reference elementov v dokumente");
+                    throw new Exception("Chyba pri hladani ds:Reference elementov v dokumente");
                 }
 
                 for (int i = 0; i < manRefElements.Count(); i++)
@@ -1126,7 +1062,8 @@ namespace SIPVS.Controllers
                     XmlElement referElement = (XmlElement) xmlDoc.ReadNode(refElem.CreateReader());
                     String uri = referElement.GetAttribute("URI").Substring(1);
 
-                    XmlElement objectElement = findByAttributeValue("ds:Object", "Id", uri, xmlDoc);
+                    //XmlElement objectElement = findByAttributeValue("ds:Object", "Id", uri, xmlDoc);
+                    XmlNode objectElement = xmlDoc.SelectSingleNode(@"//ds:Object[@Id='" + uri + "']", namespaceManager);
 
                     XmlElement digestValElement = (XmlElement) referElement.GetElementsByTagName("ds:DigestValue").Item(0);
                     XmlElement digestMethodlement = (XmlElement) referElement.GetElementsByTagName("ds:DigestMethod").Item(0);
@@ -1141,8 +1078,10 @@ namespace SIPVS.Controllers
                         XmlElement transfsElement = (XmlElement)transfsElements.Item(j);
                         XmlElement transfElement = (XmlElement) transfsElement.GetElementsByTagName("ds:Transform").Item(j);
 
-                        String transfMethod = transfElement.GetAttribute("Algorithm");
-                        byte[] objectElementBytes = System.Text.Encoding.UTF8.GetBytes(objectElement.OuterXml);
+                        String transfMethod = transfElement.GetAttribute("Algorithm"); 
+                        //System.Diagnostics.Debug.WriteLine(objectElement.OuterXml);
+                        string xElement = objectElement.OuterXml;
+                        byte[] objectElementBytes = System.Text.Encoding.UTF8.GetBytes(xElement.Replace(System.Environment.NewLine, "\n"));
 
                         if (objectElementBytes == null)
                         {
@@ -1153,9 +1092,10 @@ namespace SIPVS.Controllers
 
                         if ("http://www.w3.org/TR/2001/REC-xml-c14n-20010315".Equals(transfMethod))
                         {
+
                             try
                             {
-                                XmlDsigC14NTransform xxmlTransform = new XmlDsigC14NTransform();
+                                XmlDsigC14NTransform xxmlTransform = new XmlDsigC14NTransform(true);
                                 xxmlTransform.LoadInput(str);
                                 MemoryStream stream = (MemoryStream)xxmlTransform.GetOutput();
                                 objectElementBytes = stream.ToArray();
@@ -1193,11 +1133,11 @@ namespace SIPVS.Controllers
                         }
 
                         string actDigestValue = Convert.ToBase64String(messageDigest.ComputeHash(objectElementBytes));
-                        System.Diagnostics.Debug.WriteLine(digestMethod);
+                        //System.Diagnostics.Debug.WriteLine(actDigestValue);
                         String expectedDigestVal = digestValElement.InnerText;
-                        System.Diagnostics.Debug.WriteLine(expectedDigestVal);
+                        //System.Diagnostics.Debug.WriteLine(expectedDigestVal);
 
-                        if (expectedDigestVal.Equals(actDigestValue) == false)
+                        if (expectedDigestVal.Equals(actDigestValue) == false && manifestValid)
                         {
                             throw new Exception("Hodnota ds:DigestValue elementu ds:Reference sa nezhoduje s hash hodnotou elementu ds:Manifest.");
                         }
@@ -1293,7 +1233,6 @@ namespace SIPVS.Controllers
                 try
                 {
                     verificationResult = signer.VerifySignature(signatureValueBytes);
-
                 }
                 catch (SignatureException e)
                 {
@@ -1301,12 +1240,20 @@ namespace SIPVS.Controllers
                     throw new Exception("Core validation zlyhala. Chyba pri verifikacii digitalneho podpisu", e);
                 }
 
-                if (verificationResult == false)
+                if (verificationResult == false && coreValid)
                 {
 
                     throw new Exception("Podpisana hodnota ds:SignedInfo sa nezhoduje s hodnotou v elemente ds:SignatureValue");
                 }
 
+                //--------------------------------------------------------------------------------------------------------------------
+
+                if (coreValid && manifestValid)
+                {
+                    verifyCertificate(root, crlParser, ts_token, namespaceManager);
+                }
+
+                //--------------------------------------------------------------------------------------------------------------------
 
                 TempData["xadesResult"] = "XML subor validny!";
                 return RedirectToActionPermanent("Result");
@@ -1314,11 +1261,9 @@ namespace SIPVS.Controllers
             catch (Exception ex)
             {
                 System.Diagnostics.Debug.WriteLine(ex.Message);
-                TempData["xadesResult"] = "Datova obalka chybna!" + ex.Message;
+                TempData["xadesResult"] = ex.Message;
                 return RedirectToActionPermanent("Result");
             }
-
-            byte[] data = System.Text.Encoding.UTF8.GetBytes(input);
 
             XmlElement findByAttributeValue(string elType, string attributeName, string attributeValue, XmlDocument xmlDoc)
             {
@@ -1391,6 +1336,92 @@ namespace SIPVS.Controllers
             //Overenie casovej peciatky
 
             //Overenie platnosti podpisovaneho certifikatu
+
+            bool verifyCertificate (XElement root, X509CrlParser crlParser, TimeStampToken ts_token, XmlNamespaceManager namespaceManager) {
+
+                /*
+                 * Overenie platnosti podpisového certifikátu dokumentu voči času T z časovej pečiatky
+                 * a voči platnému poslednému CRL
+                 */
+
+                X509Crl crl2 = crlParser.ReadCrl(System.IO.File.ReadAllBytes(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + "//DTCCACrl.crl"));
+
+                XElement certificateNode = null;
+
+                certificateNode = root.XPathSelectElement("//ds:Signature/ds:KeyInfo/ds:X509Data/ds:X509Certificate", namespaceManager);
+
+                if (certificateNode == null)
+                {
+                    throw new Exception("Element ds:X509Certificate nenájdený.");
+                }
+
+                X509Certificate signCert = null;
+                Asn1InputStream asn1is = null;
+
+                try
+                {
+                    asn1is = new Asn1InputStream(new MemoryStream(Encoding.UTF8.GetBytes(certificateNode.Value)));
+                    //System.Diagnostics.Debug.WriteLine(certificateNode.Value);
+                    Asn1Sequence sq = (Asn1Sequence)asn1is.ReadObject();
+                    signCert = new X509Certificate(X509CertificateStructure.GetInstance(sq));
+                }
+                catch (Exception e)
+                {
+
+                }
+                finally
+                {
+                    if (asn1is != null)
+                    {
+                        try
+                        {
+                            asn1is.Close();
+                        }
+                        catch (Exception e)
+                        {
+                            throw new Exception("Nie je možné prečítať certifikát dokumentu.");
+                        }
+                    }
+                }
+
+                try
+                {
+                    signCert.CheckValidity(ts_token.TimeStampInfo.GenTime);
+                }
+                catch (CertificateExpiredException e)
+                {
+                    throw new CertificateExpiredException("Certifikát dokumentu bol pri podpise expirovaný.");
+                }
+                catch (CertificateNotYetValidException e)
+                {
+                    throw new CertificateNotYetValidException("Certifikát dokumentu ešte nebol platný v čase podpisovania.");
+                }
+
+                X509CrlEntry entry = crl2.GetRevokedCertificate(signCert.SerialNumber);
+                if (entry != null && entry.RevocationDate < (ts_token.TimeStampInfo.GenTime))
+                {
+                    throw new Exception("Certifikát bol zrušený v čase podpisovania.");
+                }
+                return true;
+
+            }
+
+            bool selectValidationCore (string nm) {
+                if (nm.Equals("04XadesT.xml"))
+                {
+                    return true;
+                }
+                return false;
+            }
+
+            bool selectValidationManifest(string nm)
+            {
+                if (nm.Equals("11XadesT.xml"))
+                {
+                    return true;
+                }
+                return false;
+            }
         }
 
         public ActionResult Application()

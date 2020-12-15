@@ -32,7 +32,7 @@
             reader_xml.readAsText(_xml, "UTF-8");
             reader_xml.onload = function (evt) {
                 var xml_content = evt.target.result;
-                $.post('@Url.Action("XadesResult", "Home")', { input: xml_content });
+                $.post('@Url.Action("XadesResult", "Home")', { input: xml_content, name: _xml.name });
             }
             reader_xml.onerror = function (evt) {
                 document.getElementById("fileContents").innerHTML = "Error reading XML file";
