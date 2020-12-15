@@ -220,11 +220,11 @@ namespace SIPVS.Controllers
                 // Overenie datovej obalky
                 if (doc.Root.Attribute(XNamespace.Xmlns + "xzep").Value.Equals("http://www.ditec.sk/ep/signature_formats/xades_zep/v1.0") == false)
                 {
-                    throw new Exception("Atribút xmlns:xzep koreňového elementu neobsahuje hodnotu http://www.ditec.sk/ep/signature_formats/xades_zep/v1.0");
+                    throw new Exception("Chyba v koreňovom elemente, atribút xmlns:xzep neobsahuje hodnotu http://www.ditec.sk/ep/signature_formats/xades_zep/v1.0");
                 }
                 else if (doc.Root.Attribute(XNamespace.Xmlns + "ds").Value.Equals("http://www.w3.org/2000/09/xmldsig#") == false)
                 {
-                    throw new Exception("Atribút xmlns:ds koreňového elementu neobsahuje hodnotu http://www.w3.org/2000/09/xmldsig#");
+                    throw new Exception("Chyba v koreňovom elemente, atribút xmlns:ds neobsahuje hodnotu http://www.w3.org/2000/09/xmldsig#");
                 }
 
                 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -248,7 +248,7 @@ namespace SIPVS.Controllers
 
                 if (sigMethod == null)
                 {
-                    throw new Exception("Chyba pri kontrole elementu ds:Signature/ds:SignedInfo/ds:SignatureMethod. Element nebol v dokumente nájdený");
+                    throw new Exception("Chyba počas kontroly ds:Signature/ds:SignedInfo/ds:SignatureMethod. Element sa v dokumente nenašiel.");
                 }
 
                 string[] sigMethods = { "http://www.w3.org/2000/09/xmldsig#dsa-sha1",
@@ -259,7 +259,7 @@ namespace SIPVS.Controllers
 
                 if (Array.Exists(sigMethods, element => element == sigMethod.Attribute("Algorithm").Value) == false)
                 {
-                    throw new Exception("Atribút Algorithm elementu ds:SignatureMethod neobsahuje URI niektorého z podporovaných algoritmov.");
+                    throw new Exception("Chyba v obsahu ds:SignatureMethod, atribút Algorithm neobsahuje URI niektorého z podporovaných algoritmov.");
                 }
 
                 //--------------------------------------------------------------------------------------------------------------------
@@ -270,14 +270,14 @@ namespace SIPVS.Controllers
 
                 if (canonMethod == null)
                 {
-                    throw new Exception("Chyba pri kontrole elementu ds:Signature/ds:SignedInfo/ds:CanonicalizationMethod. Element nebol v dokumente nájdený.");
+                    throw new Exception("Chyba počas kontroly ds:Signature/ds:SignedInfo/ds:CanonicalizationMethod. Element sa v dokumente nenašiel.");
                 }
 
                 string[] canonMethods = { "http://www.w3.org/TR/2001/REC-xml-c14n-20010315"};
 
                 if (Array.Exists(canonMethods, element => element == canonMethod.Attribute("Algorithm").Value) == false)
                 {
-                    throw new Exception("Atribút Algorithm elementu ds:CanonicalizationMethod neobsahuje URI niektorého z podporovaných algoritmov");
+                    throw new Exception("Chyba v elemente ds:CanonicalizationMethod, Atribút Algorithm neobsahuje URI niektorého z podporovaných algoritmov");
                 }
 
                 //--------------------------------------------------------------------------------------------------------------------
@@ -288,7 +288,7 @@ namespace SIPVS.Controllers
 
                 if (transformsElems == null)
                 {
-                    throw new Exception("Chyba pri kontrole elementu ds:Signature/ds:SignedInfo/ds:Reference/ds:Transforms. Element nebol v dokumente nájdený.");
+                    throw new Exception("Chyba počas kontroly ds:Signature/ds:SignedInfo/ds:Reference/ds:Transforms. Element sa v dokumente nenašiel.");
                 }
 
                 string[] transformMethods = { "http://www.w3.org/TR/2001/REC-xml-c14n-20010315" };
@@ -302,7 +302,7 @@ namespace SIPVS.Controllers
 
                     if (Array.Exists(transformMethods, element => element == transformElement.GetAttribute("Algorithm")) == false)
                     {
-                        throw new Exception("Atribút Algorithm elementu ds:Transforms neobsahuje URI niektorého z podporovaných algoritmov");
+                        throw new Exception("Chyba v elemente ds:Transforms, atribút Algorithm neobsahuje URI niektorého z podporovaných algoritmov");
                     }
                 }
 
@@ -314,7 +314,7 @@ namespace SIPVS.Controllers
 
                 if (digestElems == null)
                 {
-                    throw new Exception("Chyba pri kontrole elementu ds:Signature/ds:SignedInfo/ds:Reference/ds:DigestMethod. Element nebol v dokumente nájdený.");
+                    throw new Exception("Chyba počas kontroly ds:Signature/ds:SignedInfo/ds:Reference/ds:DigestMethod. Element sa v dokumente nenašiel.");
                 }
 
                 string[] digestMethods = {  "http://www.w3.org/2000/09/xmldsig#sha1",
@@ -329,7 +329,7 @@ namespace SIPVS.Controllers
 
                     if (Array.Exists(digestMethods, element => element == el.Attribute("Algorithm").Value) == false)
                     {
-                        throw new Exception("Atribút Algorithm elementu ds:DigestMethod neobsahuje URI niektorého z podporovaných algoritmov");
+                        throw new Exception("Chyba v obsahu ds:DigestMethod, atribút Algorithm neobsahuje URI niektorého z podporovaných algoritmov");
                     }
                 }
 
@@ -353,7 +353,7 @@ namespace SIPVS.Controllers
 
                 if (refElems == null)
                 {
-                    throw new Exception("Chyba pri ziskavani elementu ds:Signature/ds:SignedInfo/ds:Reference. Element nebol v dokumente nájdený.");
+                    throw new Exception("Chyba počas získavania ds:Signature/ds:SignedInfo/ds:Reference. Element sa v dokumente nenašiel.");
                 }
 
                 foreach (XElement el in refElems)
@@ -376,7 +376,7 @@ namespace SIPVS.Controllers
                     if (Array.Exists(digestMethods, element => element == digestMethodElement.GetAttribute("Algorithm")) == false)
                     {
 
-                        throw new Exception("Atribút Algorithm elementu ds:DigestMethod (" + digestMethodElement.GetAttribute("Algorithm") +") neobsahuje URI niektorého z podporovaných algoritmov");
+                        throw new Exception("Chyba v elemente ds:DigestMethod, atribút Algorithm (" + digestMethodElement.GetAttribute("Algorithm") +") neobsahuje URI niektorého z podporovaných algoritmov");
                     }
 
                     string digestMethod = digestMethodElement.GetAttribute("Algorithm");
@@ -394,7 +394,7 @@ namespace SIPVS.Controllers
                     catch (Exception e)
                     {
 
-                        throw new Exception("Core validacia zlyhala. Chyba pri tranformacii z Element do String", e);
+                        throw new Exception("Chyba pri core validacii. Transformácia z elementu na String zlyhala", e);
                     }
 
                     XmlNodeList transformsElements = manifestElement.GetElementsByTagName("ds:Transforms");
@@ -416,7 +416,7 @@ namespace SIPVS.Controllers
                             catch (Exception e)
                             {
 
-                                throw new Exception("Core validation zlyhala. Chyba pri kanonikalizacii", e);
+                                throw new Exception("Chyba pri kanonikalizacii", e);
                             }
                         }
                     }
@@ -443,7 +443,7 @@ namespace SIPVS.Controllers
 
                     if (expectedDigestValue.Equals(actualDigestValue) == false)
                     {
-                        throw new Exception("Core validation zlyhala. Hodnota ds:DigestValue elementu ds:Reference sa nezhoduje s hash hodnotou elementu ds:Manifest");
+                        throw new Exception("Chyba pri overení referencii v ds:Manifest. Hash hodnota ds:Manifest sa nezhoduje s ds:DigestValue elementu ds:Reference");
                     }
                 }
 
@@ -460,25 +460,25 @@ namespace SIPVS.Controllers
                  if (signatureElement == null)
                  {
                     
-                    throw new Exception("Element ds:Signature sa nenašiel");
+                    throw new Exception("Chyba, Element ds:Signature sa nenašiel");
                  }
 
                  if (signatureElement.HasAttribute("Id") == false)
                  {
 
-                    throw new Exception("Element ds:Signature neobsahuje atribút Id");
+                    throw new Exception("Chyba, ds:Signature nemá atribút Id");
                  }
 
                  if (signatureElement.GetAttribute("Id") == "" || signatureElement.GetAttribute("Id") == null)
                  {
 
-                    throw new Exception("Atribút Id elementu ds:Signature neobsahuje žiadnu hodnotu");
+                    throw new Exception("Chyba v elemente ds:Signature, atribút Id neobsahuje žiadnu hodnotu");
                  }
 
                  if (signatureElement.GetAttribute("xmlns:ds").Equals("http://www.w3.org/2000/09/xmldsig#") == false)
                  {
 
-                    throw new Exception("Element ds:Signature nemá nastavený namespace xmlns:ds");
+                    throw new Exception("Chyba, element ds:Signature nemá nastavený namespace xmlns:ds");
                  }
 
                 //--------------------------------------------------------------------------------------------------------------------
@@ -493,13 +493,13 @@ namespace SIPVS.Controllers
                  if (signatureValueElement == null)
                  {
 
-                    throw new Exception("Element ds:SignatureValue sa nenašiel");
+                    throw new Exception("Chyba, element ds:SignatureValue sa nenašiel.");
                  }
 
                  if (signatureValueElement.HasAttribute("Id") == false)
                  {
 
-                    throw new Exception("Element ds:SignatureValue neobsahuje atribút Id");
+                    throw new Exception("Chyba, ds:SignatureValue nemá atribút Id");
                  }
 
                 //--------------------------------------------------------------------------------------------------------------------
@@ -516,7 +516,7 @@ namespace SIPVS.Controllers
 
                 if (referencesElements == null)
                 {
-                    throw new Exception("Chyba pri ziskavani elementu ds:Signature/ds:SignedInfo/ds:Reference. Element nebol v dokumente najdeny");
+                    throw new Exception("Chyba počas získavania elementu ds:Signature/ds:SignedInfo/ds:Reference. Element sa v dokumente nepodarilo nájsť.");
                 }
 
                 foreach (XElement el in referencesElements)
@@ -533,12 +533,12 @@ namespace SIPVS.Controllers
                     catch (XPathException e)
                     {
 
-                        throw new Exception("Chyba pri overeni existencie referencií v ds:SignedInfo. Chyba pri ziskavani elementu s Id " + uri);
+                        throw new Exception("Chyba pri overení existencie referencií v ds:SignedInfo. Chyba pri ziskavani elementu s Id: " + uri);
                     }
 
                     if (referencedElement == null)
                     {
-                        throw new Exception("Chyba pri overeni existencie referencií v ds: SignedInfo.Neexistuje element s Id: " + uri);
+                        throw new Exception("Chyba pri overení referencií v ds: SignedInfo. Nenašiel sa element s Id: " + uri);
                     }
 
                     XmlElement helper = (XmlElement)xmlDoc.ReadNode(referencedElement.CreateReader());
@@ -553,7 +553,7 @@ namespace SIPVS.Controllers
 
                     if (references.ContainsKey(referencedElementName) == false)
                     {
-                        throw new Exception("Chyba pri overeni existencie referencií v ds:SignedInfo. Neznama referencia " + referencedElementName);
+                        throw new Exception("Chyba pri overovaní existencie referencií v ds:SignedInfo. Neznáma referencia " + referencedElementName);
                     }
 
                     string expectedReferenceType = references[referencedElementName];
@@ -561,7 +561,7 @@ namespace SIPVS.Controllers
                     if (actualType.Equals(expectedReferenceType) == false)
                     {
 
-                        throw new Exception("Chyba pri overeni zhody referencií v ds:SignedInfo. " + actualType + " sa nezhoduje s " + expectedReferenceType);
+                        throw new Exception("Chyba pri overeni zhody referencií v ds:SignedInfo. " + expectedReferenceType + " sa nezhoduje s " + actualType);
                     }
 
                     XElement keyInfoReferenceElement = null;
@@ -573,13 +573,13 @@ namespace SIPVS.Controllers
                     catch (Exception e)
                     {
 
-                        throw new Exception("Chyba pri overeni existencie referencií v ds:SignedInfo." + "Chyba pri ziskavani elementu s Type http://www.w3.org/2000/09/xmldsig#Object", e);
+                        throw new Exception("Chyba pri overovaní existencie referencií v ds:SignedInfo." + "Chyba počas získavania elementu s Type http://www.w3.org/2000/09/xmldsig#Object", e);
                     }
 
                     if (keyInfoReferenceElement == null)
                     {
 
-                        throw new Exception("Neexistuje referencia na ds:KeyInfo element v elemente ds:Reference");
+                        throw new Exception("Chyba v elemente ds:Reference, neexistuje referencia na ds:KeyInfo element.");
                     }
 
                     XElement signaturePropertieReferenceElement = null;
@@ -590,13 +590,13 @@ namespace SIPVS.Controllers
                     }
                     catch (Exception e)
                     {
-                        throw new Exception("Chyba pri overeni existencie referencií v ds:SignedInfo." + "Chyba pri ziskavani elementu s Type http://www.w3.org/2000/09/xmldsig#SignatureProperties", e);
+                        throw new Exception("Chyba pri overovaní existencie referencií v ds:SignedInfo." + "Chyba počas získavania elementu s Type http://www.w3.org/2000/09/xmldsig#SignatureProperties", e);
                     }
 
                     if (signaturePropertieReferenceElement == null)
                     {
 
-                        throw new Exception("Neexistuje referencia na ds:SignatureProperties element v elemente ds:Reference");
+                        throw new Exception("Chyba, v elemente ds:Reference neexistuje referencia na ds:SignatureProperties.");
                     }
 
                     XElement signedInfoReferenceElement = null;
@@ -607,13 +607,13 @@ namespace SIPVS.Controllers
                     }
                     catch (Exception e)
                     {
-                        throw new Exception("Chyba pri overeni existencie referencií v ds:SignedInfo." + "Chyba pri ziskavani elementu s Type http://uri.etsi.org/01903#SignedProperties", e);
+                        throw new Exception("Chyba pri overovaní existencie referencií v ds:SignedInfo." + "Chyba počas získavania elementu s Type http://uri.etsi.org/01903#SignedProperties", e);
                     }
 
                     if (signedInfoReferenceElement == null)
                     {
 
-                        throw new Exception("Neexistuje referencia na xades:SignedProperties element v elemente ds:Reference");
+                        throw new Exception("Chyba, neexistuje referencia na xades:SignedProperties v elemente ds:Reference");
                     }
 
 
@@ -634,19 +634,19 @@ namespace SIPVS.Controllers
                 if (keyInfoElement == null)
                 {
 
-                    throw new Exception("Element ds:Signature sa nenašiel");
+                    throw new Exception("Chyba, element ds:Signature sa nenašiel");
                 }
 
                 if (keyInfoElement.HasAttribute("Id") == false)
                 {
 
-                    throw new Exception("Element ds:Signature neobsahuje atribút Id");
+                    throw new Exception("Chyba v elemente ds:Signature, nemá atribút Id");
                 }
 
                 if (keyInfoElement.GetAttribute("Id") == "" || keyInfoElement.GetAttribute("Id") == null)
                 {
 
-                    throw new Exception("Atribút Id elementu ds:Signature neobsahuje žiadnu hodnotu");
+                    throw new Exception("Chyba v elemente ds:Signature, atribút Id neobsahuje žiadnu hodnotu");
                 }
 
                 XmlElement xDataElement = (XmlElement) keyInfoElement.GetElementsByTagName("ds:X509Data").Item(0);
@@ -654,7 +654,7 @@ namespace SIPVS.Controllers
                 if (xDataElement == null)
                 {
 
-                    throw new Exception("Element ds:KeyInfo neobsahuje element ds:X509Data");
+                    throw new Exception("Chyba v element ds:KeyInfo, neobsahuje element ds:X509Data");
                 }
 
                 XmlElement xCertificateElement = (XmlElement)xDataElement.GetElementsByTagName("ds:X509Certificate").Item(0);
@@ -664,19 +664,19 @@ namespace SIPVS.Controllers
                 if (xCertificateElement == null)
                 {
 
-                    throw new Exception("Element ds:X509Data neobsahuje element ds:X509Certificate");
+                    throw new Exception("Chyba v elemente ds:X509Data, neobsahuje element ds:X509Certificate");
                 }
 
                 if (xIssuerSerialElement == null)
                 {
 
-                    throw new Exception("Element ds:X509Data neobsahuje element ds:X509IssuerSerial");
+                    throw new Exception("Chyba v elemente ds:X509Data, neobsahuje element ds:X509IssuerSerial");
                 }
 
                 if (xSubjectNameElement == null)
                 {
 
-                    throw new Exception("Element ds:X509Data neobsahuje element ds:X509SubjectName");
+                    throw new Exception("Chyba v elemente ds:X509Data, neobsahuje element ds:X509SubjectName");
                 }
 
                 XmlElement xIssuerNameElement = (XmlElement) xIssuerSerialElement.GetElementsByTagName("ds:X509IssuerName").Item(0);
@@ -685,13 +685,13 @@ namespace SIPVS.Controllers
                 if (xIssuerNameElement == null)
                 {
 
-                    throw new Exception("Element ds:X509IssuerSerial neobsahuje element ds:X509IssuerName");
+                    throw new Exception("Chyba v elemente ds:X509IssuerSerial, neobsahuje element ds:X509IssuerName");
                 }
 
                 if (xSerialNumberElement == null)
                 {
 
-                    throw new Exception("Element ds:X509IssuerSerial neobsahuje element ds:X509SerialNumber");
+                    throw new Exception("Chyba v elemente ds:X509IssuerSerial, neobsahuje element ds:X509SerialNumber");
                 }
 
                 X509Certificate certificateKeyInfo = null;
@@ -703,7 +703,7 @@ namespace SIPVS.Controllers
                 catch (Exception e)
                 {
 
-                    throw new Exception("X509 certifikát sa v dokumente nepodarilo nájsť", e);
+                    throw new Exception("Chyba, certifikát X509 sa v dokumente nenašiel.", e);
                 }
 
                 System.Security.Cryptography.X509Certificates.X509Certificate cert = new System.Security.Cryptography.X509Certificates.X509Certificate(certificateKeyInfo.GetEncoded());
@@ -716,19 +716,19 @@ namespace SIPVS.Controllers
                 if (xIssuerNameElement.FirstChild.Value.Equals(certifIssuerName) == false)
                 {
 
-                    throw new Exception("Element ds:X509IssuerName sa nezhoduje s hodnotou na certifikáte");
+                    throw new Exception("Chyba, element ds:X509IssuerName sa nezhoduje s hodnotou na certifikáte");
                 }
 
                 if (xSerialNumberElement.FirstChild.Value.Equals(certifSerialNumber) == false)
                 {
 
-                    throw new Exception("Element ds:X509SerialNumber sa nezhoduje s hodnotou na certifikáte");
+                    throw new Exception("Chyba, element ds:X509SerialNumber sa nezhoduje s hodnotou na certifikáte");
                 }
 
                 if (xSubjectNameElement.FirstChild.Value.Equals(certifSubjectName) == false)
                 {
 
-                    throw new Exception("Element ds:X509SubjectName neobsahuje element ds:X509SerialNumber");
+                    throw new Exception("Chyba v element ds:X509SubjectName, neobsahuje element ds:X509SerialNumber");
                 }
 
                 //--------------------------------------------------------------------------------------------------------------------
@@ -744,17 +744,17 @@ namespace SIPVS.Controllers
 
                 if (signaturePropertiesElement == null)
                 {
-                    throw new Exception("Element ds:SignatureProperties sa nenašiel");
+                    throw new Exception("Chyba, element ds:SignatureProperties sa nepodarilo nájsť.");
                 }
 
                 if (signaturePropertiesElement.HasAttribute("Id") == false)
                 {
-                    throw new Exception("Element ds:SignatureProperties neobsahuje atribút Id");
+                    throw new Exception("Chyba v elemente ds:SignatureProperties, nemá atribút Id.");
                 }
 
                 if (signaturePropertiesElement.GetAttribute("Id") == "" || signaturePropertiesElement.GetAttribute("Id") == null)
                 {
-                    throw new Exception("Atribút Id elementu ds:SignatureProperties neobsahuje žiadnu hodnotu");
+                    throw new Exception("Chyba v elemente ds:SignatureProperties, atribút Id neobsahuje žiadnu hodnotu");
                 }
 
                 XmlElement signatureVersionElement = null;
@@ -790,20 +790,20 @@ namespace SIPVS.Controllers
                 if (signatureVersionElement == null)
                 {
 
-                    throw new Exception("ds:SignatureProperties neobsahuje taký element ds:SignatureProperty, ktorý by obsahoval element xzep:SignatureVersion");
+                    throw new Exception("Chyba v elemente ds:SignatureProperties, element neobsahuje taký ds:SignatureProperty, ktorý by obsahoval xzep:SignatureVersion");
 
                 }
 
                 if (productInfosElement == null)
                 {
-                    throw new Exception("ds:SignatureProperties neobsahuje taký element ds:SignatureProperty, ktorý by obsahoval element xzep:ProductInfos");
+                    throw new Exception("Chyba v elemente ds:SignatureProperties, element neobsahuje taký ds:SignatureProperty, ktorý by obsahoval xzep:ProductInfos");
                 }
 
                 XmlElement signature = (XmlElement) xmlDoc.GetElementsByTagName("ds:Signature").Item(0);
 
                 if (signature == null)
                 {
-                    throw new Exception("Element ds:Signature sa nenašiel");
+                    throw new Exception("Chyba, element ds:Signature sa nenašiel.");
                 }
 
                 String signatureId = signature.GetAttribute("Id");
@@ -814,12 +814,12 @@ namespace SIPVS.Controllers
 
                 if (targetSigVer.Equals("#" + signatureId) == false)
                 {
-                    throw new Exception("Atribút Target elementu xzep:SignatureVersion sa neodkazuje na daný ds:Signature");
+                    throw new Exception("Chyba v elemente xzep:SignatureVersion, atribút Target neodkazuje na daný ds:Signature");
                 }
 
                 if (targetPInfo.Equals("#" + signatureId) == false)
                 {
-                    throw new Exception("Atribút Target elementu xzep:ProductInfos sa neodkazuje na daný ds:Signature");
+                    throw new Exception("Chyba v elemente xzep:ProductInfos, atribút Target neodkazuje na daný ds:Signature");
                 }
 
                 //--------------------------------------------------------------------------------------------------------------------
@@ -837,7 +837,7 @@ namespace SIPVS.Controllers
 
                 if (manifestElems == null)
                 {
-                    throw new Exception("Chyba pri hladaní ds:Manifest elementov v dokumente.");
+                    throw new Exception("Chyba počas vyhľadávania elementov ds:Manifest.");
                 }
 
                 foreach (XElement manifestElem in manifestElems)
@@ -850,14 +850,14 @@ namespace SIPVS.Controllers
 
                     if (manElement.HasAttribute("Id") == false)
                     {
-                        throw new Exception("Element ds:Manifest nema atribut Id");
+                        throw new Exception("Chyba, element ds:Manifest nemá atribút Id");
                     }
 
                     IEnumerable<XElement> referElements = manifestElem.XPathSelectElements("ds:Reference", namespaceManager);
 
                     if (referElements == null)
                     {
-                        throw new Exception("Chyba pri hladanii ds:Reference elementov v ds:Manifest elemente");
+                        throw new Exception("Chyba počas vyhľadávania elementov ds:Reference elemente v ds:Manifest.");
                     }
 
                     /*
@@ -865,7 +865,7 @@ namespace SIPVS.Controllers
                      */
                     if (referElements.Count() != 1)
                     {
-                        throw new Exception("ds:Manifest element neobsahuje prave jednu referenciu na objekt");
+                        throw new Exception("Chyba, element ds:Manifest neobsahuje práve 1 referenciu na objekt.");
                     }
                 }
 
@@ -873,7 +873,7 @@ namespace SIPVS.Controllers
 
                 if (referenceElements == null)
                 {
-                    throw new Exception("Chyba pri hladani ds:Reference elementov v dokumente.");
+                    throw new Exception("Chyba počas vyhľadávania elementov ds:Reference.");
                 }
 
                 foreach(XElement referenceElement in referenceElements)
@@ -882,7 +882,7 @@ namespace SIPVS.Controllers
 
                     if (transformElems == null)
                     {
-                        throw new Exception("Chyba pri hladani ds:Transform elementov v dokumente.");
+                        throw new Exception("Chyba počas vyhľadávania elementov ds:Transform.");
                     }
 
                     foreach(XElement transformElem in transformElems)
@@ -897,7 +897,7 @@ namespace SIPVS.Controllers
                         if (Array.Exists(manifestMethods, element => element == transformElem.Attribute("Algorithm").Value) == false)
                         {
 
-                            throw new Exception("Element ds:Transform obsahuje nepovoleny typ algoritmu");
+                            throw new Exception("Chyba, element ds:Transform obsahuje nepovolený typ algoritmu.");
                         }
                     }
 
@@ -905,7 +905,7 @@ namespace SIPVS.Controllers
 
                     if (digestMethodElement == null)
                     {
-                        throw new Exception("Chyba pri hladani ds:DigestMethod elementov v dokumente");
+                        throw new Exception("Chyba počas vyhľadávania elementov ds:DigestMethod.");
                     }
 
                     /*
@@ -913,7 +913,7 @@ namespace SIPVS.Controllers
                      */
                     if (Array.Exists(digestMethods, element => element == digestMethodElement.Attribute("Algorithm").Value) == false)
                     {
-                        throw new Exception("Atribút Algorithm elementu ds:DigestMethod neobsahuje URI niektorého z podporovaných algoritmov");
+                        throw new Exception("Chyba v elemente ds:DigestMethod, atribút Algorithm neobsahuje URI niektorého z podporovaných algoritmov");
                     }
 
                     /*
@@ -921,7 +921,7 @@ namespace SIPVS.Controllers
                      */
                     if (referenceElement.Attribute("Type").Value.Equals("http://www.w3.org/2000/09/xmldsig#Object") == false)
                     {
-                        throw new Exception("Atribút Type elementu ds:Reference neobsahuje hodnotu http://www.w3.org/2000/09/xmldsig#Object");
+                        throw new Exception("Chyba v elemente ds:Reference, Atribút Type neobsahuje hodnotu http://www.w3.org/2000/09/xmldsig#Object");
                     }
 
                 }
@@ -936,7 +936,7 @@ namespace SIPVS.Controllers
 
                 if (timestamp == null)
                 {
-                    throw new Exception("Dokument neobsahuje casovu peciatku.");
+                    throw new Exception("Chyba, v dokumente sa nenašla časová pečiatka.");
                 }
 
                 ts_token = new TimeStampToken(new CmsSignedData(Base64.Decode(timestamp.Value)));
@@ -974,17 +974,17 @@ namespace SIPVS.Controllers
 
                 if (signerCert == null)
                 {
-                    throw new Exception("V dokumente sa nenachadza certifikat casovej peciatky.");
+                    throw new Exception("Chyba, nenašiel sa certifikát časovej pečiatky.");
                 }
 
                 if (!signerCert.IsValidNow)
                 {
-                    throw new Exception("Podpisový certifikát časovej pečiatky nie je platný voči aktuálnemu času.");
+                    throw new Exception("Chyba, podpisový certifikát časovej pečiatky je neplatný voči aktuálnemu času.");
                 }
 
                 if (crl.GetRevokedCertificate(signerCert.SerialNumber) != null)
                 {
-                    throw new Exception("Podpisový certifikát časovej pečiatky nie je platný voči platnému poslednému CRL.");
+                    throw new Exception("Chyba, podpisový certifikát časovej pečiatky je neplatný voči platnému poslednému CRL.");
                 }
 
                 /*
@@ -1001,7 +1001,7 @@ namespace SIPVS.Controllers
 
                 if (signatureValueNode == null)
                 {
-                    throw new Exception("Element ds:SignatureValue nenájdený.");
+                    throw new Exception("Chyba, element ds:SignatureValue sa nenašiel.");
                 }
 
                 //XmlElement sigValueNode = (XmlElement)xmlDoc.ReadNode(signatureValueNode.CreateReader());
@@ -1032,13 +1032,13 @@ namespace SIPVS.Controllers
                         hashTAlgo = SHA512.Create();
                         break;
                     default:
-                        throw new Exception("Core validation zlyhala, neznamy algoritmus " + digMethod);
+                        throw new Exception("Chyba počas core validácie, neznámy algoritmus " + digMethod);
                 }
 
                 byte[] comparisonVal = hashTAlgo.ComputeHash(signatureValue);
 
                 if (messageImprint.Equals(comparisonVal)){
-			        throw new Exception("MessageImprint z časovej pečiatky a podpis ds:SignatureValue sa nezhodujú.");
+			        throw new Exception("Chyba, hodnoty podpisu ds:SignatureValue a MessageImprint z časovej pečiatky sa nezhodujú.");
 		        }
 
                 //--------------------------------------------------------------------------------------------------------------------
@@ -1053,7 +1053,7 @@ namespace SIPVS.Controllers
 
                 if (manRefElements == null)
                 {
-                    throw new Exception("Chyba pri hladani ds:Reference elementov v dokumente");
+                    throw new Exception("Chyba pri hľadaní ds:Reference elementov v dokumente");
                 }
 
                 for (int i = 0; i < manRefElements.Count(); i++)
@@ -1085,7 +1085,7 @@ namespace SIPVS.Controllers
 
                         if (objectElementBytes == null)
                         {
-                            throw new Exception("Overenie referencií v elementoch ds:Manifest zlyhalo. Chyba pri tranformacii z Element do String");
+                            throw new Exception("Chyba pri tranformácii elementu na String");
                         }
 
                         MemoryStream str = new MemoryStream(objectElementBytes);
@@ -1103,7 +1103,7 @@ namespace SIPVS.Controllers
                             }
                             catch (Exception e) {
 
-                                throw new Exception("Core validation zlyhala. Chyba pri kanonikalizacii", e);
+                                throw new Exception("Chyba počas kanonikalizácie", e);
                             }
                         }
 
@@ -1129,7 +1129,7 @@ namespace SIPVS.Controllers
                                 messageDigest = SHA512.Create();
                                 break;
                             default:
-                                throw new Exception("Core validation zlyhala, neznamy algoritmus " + digestMethod);
+                                throw new Exception("Chyba počas core validácie, neznámy algoritmus " + digestMethod);
                         }
 
                         string actDigestValue = Convert.ToBase64String(messageDigest.ComputeHash(objectElementBytes));
@@ -1139,7 +1139,7 @@ namespace SIPVS.Controllers
 
                         if (expectedDigestVal.Equals(actDigestValue) == false && manifestValid)
                         {
-                            throw new Exception("Hodnota ds:DigestValue elementu ds:Reference sa nezhoduje s hash hodnotou elementu ds:Manifest.");
+                            throw new Exception("Chyba, hash hodnota ds:Manifest sa nezhoduje s ds:DigestValue elementu ds:Reference.");
                         }
                     }
                 }
@@ -1176,7 +1176,7 @@ namespace SIPVS.Controllers
                 catch (Exception e)
                 {
 
-                    throw new Exception("Core validation zlyhala. Chyba pri tranformacii z Element do String", e);
+                    throw new Exception("Chyba počas tranformácie elementu na String", e);
                 }
 
                 string canonicalizationMethod = canonicalizationMethodElement.GetAttribute("Algorithm");
@@ -1193,7 +1193,7 @@ namespace SIPVS.Controllers
                     catch (Exception e)
                     {
 
-                        throw new Exception("Core validation zlyhala. Chyba pri kanonikalizacii", e);
+                        throw new Exception("Chyba počas kanonikalizácie.", e);
                     }
                 }
 
@@ -1207,7 +1207,7 @@ namespace SIPVS.Controllers
                 catch (Exception e)
                 {
 
-                    throw new Exception("X509 certifikát sa v dokumente nepodarilo nájsť", e);
+                    throw new Exception("Chyba, certifikát X509 sa v dokumente nenašiel.", e);
                 }
 
                 string signatureMethod = signatureMethodElement.GetAttribute("Algorithm");
@@ -1223,7 +1223,7 @@ namespace SIPVS.Controllers
                 }
                 catch (Exception e) {
 
-                    throw new Exception("Core validation zlyhala. Chyba pri inicializacii prace s digitalnym podpisom", e);
+                    throw new Exception("Chyba počas inicializácie digitálneho podpisovača.", e);
                 }
 
                 byte[] signatureValueBytes = System.Text.Encoding.UTF8.GetBytes(signatureValueElement.OuterXml);
@@ -1237,13 +1237,13 @@ namespace SIPVS.Controllers
                 catch (SignatureException e)
                 {
 
-                    throw new Exception("Core validation zlyhala. Chyba pri verifikacii digitalneho podpisu", e);
+                    throw new Exception("Chyba počas verifikacie digitalneho podpisu", e);
                 }
 
                 if (verificationResult == false && coreValid)
                 {
 
-                    throw new Exception("Podpisana hodnota ds:SignedInfo sa nezhoduje s hodnotou v elemente ds:SignatureValue");
+                    throw new Exception("Chyba, hodnota v ds:SignatureValue sa nezhoduje s hodnotou v ds:SignedInfo");
                 }
 
                 //--------------------------------------------------------------------------------------------------------------------
@@ -1255,7 +1255,7 @@ namespace SIPVS.Controllers
 
                 //--------------------------------------------------------------------------------------------------------------------
 
-                TempData["xadesResult"] = "XML subor validny!";
+                TempData["xadesResult"] = "XML subor valídny!";
                 return RedirectToActionPermanent("Result");
             }
             catch (Exception ex)
@@ -1290,21 +1290,21 @@ namespace SIPVS.Controllers
 
                 if (keyInfoElement == null)
                 {
-                    throw new Exception("Chyba pri ziskavani certifikatu: Dokument neobsahuje element ds:KeyInfo");
+                    throw new Exception("Chyba v obsahu ds:KeyInfo, dokument neobsahuje element ds:KeyInfo");
                 }
 
                 XmlElement x509DataElement = (XmlElement)keyInfoElement.GetElementsByTagName("ds:X509Data").Item(0);
 
                 if (x509DataElement == null)
                 {
-                    throw new Exception("Chyba pri ziskavani certifikatu: Dokument neobsahuje element ds:X509Data");
+                    throw new Exception("Chyba v obsahu ds:KeyInfo, dokument neobsahuje element ds:X509Data");
                 }
 
                 XmlElement x509Certificate = (XmlElement)x509DataElement.GetElementsByTagName("ds:X509Certificate").Item(0);
 
                 if (x509Certificate == null)
                 {
-                    throw new Exception("Chyba pri ziskavani certifikatu: Dokument neobsahuje element ds:X509Certificate");
+                    throw new Exception("Chyba v obsahu ds:KeyInfo, dokument neobsahuje element ds:X509Certificate");
                 }
 
                 X509Certificate certObject = null;
@@ -1319,7 +1319,7 @@ namespace SIPVS.Controllers
                 }
                 catch (Exception e) {
 
-                    throw new Exception("Certifikát nebolo možné načítať", e);
+                    throw new Exception("Chyba, certifikát nie je možné načítať", e);
 
                 }
                 finally
@@ -1352,7 +1352,7 @@ namespace SIPVS.Controllers
 
                 if (certificateNode == null)
                 {
-                    throw new Exception("Element ds:X509Certificate nenájdený.");
+                    throw new Exception("Chyba, element ds:X509Certificate sa nenašiel.");
                 }
 
                 X509Certificate signCert = null;
@@ -1379,7 +1379,7 @@ namespace SIPVS.Controllers
                         }
                         catch (Exception e)
                         {
-                            throw new Exception("Nie je možné prečítať certifikát dokumentu.");
+                            throw new Exception("Chyba, nie je možné prečítať certifikát dokumentu.");
                         }
                     }
                 }
@@ -1390,17 +1390,17 @@ namespace SIPVS.Controllers
                 }
                 catch (CertificateExpiredException e)
                 {
-                    throw new CertificateExpiredException("Certifikát dokumentu bol pri podpise expirovaný.");
+                    throw new CertificateExpiredException("Chyba, expirovaný certifikát dokumentu pri podpise.");
                 }
                 catch (CertificateNotYetValidException e)
                 {
-                    throw new CertificateNotYetValidException("Certifikát dokumentu ešte nebol platný v čase podpisovania.");
+                    throw new CertificateNotYetValidException("Chyba, certifikát dokumentu neplatný v čase podpisovania.");
                 }
 
                 X509CrlEntry entry = crl2.GetRevokedCertificate(signCert.SerialNumber);
                 if (entry != null && entry.RevocationDate < (ts_token.TimeStampInfo.GenTime))
                 {
-                    throw new Exception("Certifikát bol zrušený v čase podpisovania.");
+                    throw new Exception("Chyba, certifikát zrušený počas podpisovania.");
                 }
                 return true;
 
